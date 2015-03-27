@@ -1,0 +1,27 @@
+﻿<!--<div class="elLegend">
+    <div>
+        <span class="arr" data-dojo-attach-point="arLeft"></span>
+        <div class="legend_element_set">
+            <span class="arrdown" data-dojo-attach-point="arDown"></span>
+            <span class="arrup" data-dojo-attach-point="arUp"></span>
+            <span class="settings" data-dojo-attach-point="arSet"></span>
+        </div>
+        
+    </div>
+    <div class="clsPlatform" data-dojo-attach-point="Platform"></div>
+    <div data-dojo-attach-point="Legend"></div>
+</div>
+-->
+<div class="elLegend">
+    <div>
+        <span class="arr" data-dojo-attach-point="arLeft" data-dojo-attach-event="onclick:ShowHideSubLegend"></span>
+        <div class="legend_element_set">
+            <span class="arrdown" data-dojo-attach-point="arDown"></span>
+            <span class="arrup" data-dojo-attach-point="arUp"></span>
+            <span class="settings" style="display:none" data-dojo-attach-point="arSet" data-dojo-attach-event="onclick:ShowHideSettings"></span>
+        </div>
+        <span data-dojo-attach-point="titleNode"></span>
+    </div>
+    <div class="clsPlatform" data-dojo-attach-point="Platform"></div>
+    <div class="tree-view" data-dojo-attach-point="Legend"></div>
+</div>

@@ -1,0 +1,700 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    
+    <title>ГИС ДВ</title>      
+    <link rel="Shortcut Icon" type="image/x-icon" href="images/sat.ico" /> 
+
+      <!--10 . 8 . 6 . 5 -->
+     
+   <!--        
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/dijit/themes/tundra/tundra.css"/>
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/esri/css/esri.css" />
+    <script type="text/javascript" src="http://10.8.6.5/scripts/3.12/init.js"></script>
+         
+          
+  
+      <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.12/dijit/themes/tundra/tundra.css"/>
+         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.12/esri/css/esri.css" />
+         <script type="text/javascript" src="http://js.arcgis.com/3.12/init.js"></script> 
+
+
+   
+  --> 
+      
+    <link rel="stylesheet" type="text/css" href="http://10.8.3.191/scripts/3.12/dijit/themes/tundra/tundra.css"/>
+    <link rel="stylesheet" type="text/css" href="http://10.8.3.191/scripts/3.12/esri/css/esri.css" />
+    <script type="text/javascript" src="http://10.8.3.191/scripts/3.12/init.js"></script> 
+
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/legend.css">
+    
+    <!--
+        Create WMS
+    -->    
+    <script type="text/javascript" src="scripts/clschangeitem.js"></script>
+    <script type="text/javascript" src="scripts/legend.js"></script>
+    <script type="text/javascript" src="scripts/lineEditor.js"></script>
+    <script type="text/javascript" src="scripts/DatesSelector.js"></script>
+    <script type="text/javascript" src="scripts/dcrscplanetaclass.js"></script>
+    <script src="scripts/timeslider.js"></script>
+    <script src="scripts/setlayers.js"></script>
+    <script src="scripts/basemaps.js"></script>
+    <script src="scripts/loadmap.js"></script>
+    <script type="text/javascript" src="scripts/FastCalendar.js"></script>    
+        
+    
+    <script type="text/javascript" src="scripts/clsInfo.js"></script>
+    <script src="lib/d3/d3.js"></script>
+    <script src="conrec.js"></script>
+    <!--
+        Load map
+    -->
+    <script>
+
+
+           var ip_serv = "http://10.8.3.191/";  //их локалака (прокси)
+       // var ip_serv = "http://10.8.6.6/"; //наша локалка (прокси на все ресурсы)
+       // var ip_serv = "http://www.meteo-dv.ru/"; // инет
+
+
+        var layer, map, visible = [];
+        var timeSlider;
+        var scalebar;
+
+        dojo.ready(function () {
+                        
+           initLineDitor();
+           initWMSLayer();
+           initDatesSelector();
+           initMap();
+        });          
+
+
+        //после загрузки всего документа запускается следующий код
+        window.onload = function () {
+
+            
+            dojo.on(dojo.dom.byId("btnRefTime"), "click", refreshSlider);
+            dojo.on(dojo.dom.byId("intervals"), "change", refreshSlider);
+
+        };
+
+    </script>
+
+    <!--
+        Search task
+    -->
+    <script>        
+        var queryTaskSearch;
+        var querySerch;
+        var fSetSearch;
+
+        require(["esri/tasks/QueryTask", "esri/tasks/query"], function (QueryTask, Query) {
+            queryTaskSearch = new QueryTask(ip_serv + "arcgis/rest/services/attrib/statsearch/MapServer/0");
+            querySearch = new Query();
+            querySearch.returnGeometry = true;
+            querySearch.outFields = ["name", "id", "station_ty"];
+        });
+
+        function executeQuerySearch(name) {
+            querySearch.where = "UPPER(NAME) LIKE UPPER('" + name + "%') OR id LIKE UPPER('" + name + "%')";
+            queryTaskSearch.execute(querySearch, showResults);
+        }
+
+        dojo.require("esri.symbols.PictureMarkerSymbol");
+        dojo.require("esri.graphic");
+        dojo.require("esri.renderers.SimpleRenderer");
+        function zoom2Search(index) {
+            var geom = fSetSearch[index].geometry;
+            if (geom !== undefined) {
+                map.centerAndZoom(geom, 12);
+                var symbol = new esri.symbols.PictureMarkerSymbol("images/esri_icon.png", 23, 34);
+                var graphic = new esri.graphic(geom, symbol);
+                map.graphics.add(graphic);
+                window.setTimeout(function () { map.graphics.clear() }, 10000);
+            }
+        }
+
+        function showResults(featureSet) {
+            fSetSearch = featureSet.features;
+            var container = dojo.byId("divSearchResult");
+            //clear old
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            var listElement = document.createElement("ul");
+            listElement.style.listStyle = "none";
+            listElement.style.padding = "0px";
+            listElement.className = "elLegend";
+
+            container.appendChild(listElement);
+            var resultFeatures = featureSet.features;
+            for (var i = 0, il = resultFeatures.length; i < il; i++) {
+                var graphic = resultFeatures[i];
+                var listItem = document.createElement("li");
+                listItem.className = "listation";
+                var type = "";
+                if (graphic.attributes.station_ty == 1) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/>"; }
+                if (graphic.attributes.station_ty == 2) { type = "<img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
+                if (graphic.attributes.station_ty == 3) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/> <img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
+                if (graphic.attributes.station_ty == 4) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/>"; }
+                if (graphic.attributes.station_ty == 5) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/> <img class=\"legimg\" src=\"images/search/met.png\"/>"; }
+                if (graphic.attributes.station_ty == 6) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/><img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
+                if (graphic.attributes.station_ty == 7) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/><img class=\"legimg\" src=\"images/search/hyd.png\"/><img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
+                if (graphic.attributes.station_ty == 8) { type = "<img class=\"legimg\" src=\"images/search/smallSity.png\"/>"; }
+                if (graphic.attributes.station_ty == 9) { type = "<img class=\"legimg\" src=\"images/search/bigSity.png\"/>"; }
+                if (graphic.attributes.station_ty == 10) { type = "<img class=\"legimg\" src=\"images/search/river.png\"/>"; }
+                if (graphic.attributes.station_ty == 11) { type = "<img class=\"legimg\" src=\"images/search/lake.png\"/>"; }
+                if (graphic.attributes.station_ty == 1 || graphic.attributes.station_ty == 2 || graphic.attributes.station_ty == 3 || graphic.attributes.station_ty == 4 || graphic.attributes.station_ty == 5 || graphic.attributes.station_ty == 6 || graphic.attributes.station_ty == 7) {
+                    listItem.innerHTML = type + graphic.attributes.name + "<br/>" + "   index: ".bold() + graphic.attributes.id;
+                } else {
+                    listItem.innerHTML = type + graphic.attributes.name;
+                }
+                
+                //listItem.addEventListener('click', function (i) {
+                //    if (fSetSearch[i].geometry !== undefined) {
+                //        map.centerAndZoom(fSetSearch[i].geometry, 12);
+                //    }
+                //});
+                //listElement.onclick = function () { return zoom2Search(i + ''); };
+                listItem.setAttribute('onClick', 'zoom2Search(' + i + ')');
+                listElement.appendChild(listItem);
+            }
+        }
+    
+        dojo.require("esri.tasks.query");
+
+        function getDates(id, url, ds, de) {
+            var queryTask = new esri.tasks.QueryTask(url);            
+            var query = new esri.tasks.Query();
+            query.returnGeometry = false;
+            query.text = id;
+            query.outFields = ["datadatetime"];
+            query.orderByFields = ["datadatetime"];            
+            query.returnDistinctValues = true;
+
+            //var dde = de.getFullYear() + "-" + ("0" + (de.getMonth() + 1)).slice(-2) + "-" + ("0" + de.getDate()).slice(-2) + " " + ("0" + de.getHours()).slice(-2) + ":00:00";
+            //var dds = ds.getFullYear() + "-" + ("0" + (ds.getMonth() + 1)).slice(-2) + "-" + ("0" + ds.getDate()).slice(-2) + " " + ("0" + ds.getHours()).slice(-2) + ":00:00";
+            query.where = "datadatetime between '" + ds + "' AND '" + de + "'";
+            
+            queryTask.execute(query, function mf(evt) { getDatesResult(id, evt) }, errorDates);
+        }
+        function getDatesResult(id, featureSet) {
+            var dates = [];
+            for (var i = 0; i < featureSet.features.length; i++) {
+                dates.push(new Date(featureSet.features[i].attributes.datadatetime));
+            }
+            var container = dojo.byId("divDates");
+            //clear old
+            //while (container.firstChild) {
+            //    container.removeChild(container.firstChild);
+            //}
+            var title = document.createElement("p");
+            title.innerText = id;
+            container.appendChild(title);
+            var listElement = document.createElement("ul");
+            container.appendChild(listElement);            
+            for (var i = 0; i < dates.length;  i++) {                
+                var listItem = document.createElement("li");
+                listItem.innerHTML = dates[i];
+                listElement.appendChild(listItem);
+            }
+            
+        }
+        function errorDates(errSet) {
+            var kk = 9;
+        }
+
+    </script>
+    <!--
+        Check Boxes
+    -->
+    <script src="scripts/selectlayer.js"></script>  
+    <!--
+        Show\Hide DIV
+    -->     
+    <script>
+        function ShowHideWindow(Div) {
+            if (dojo.style(dojo.byId(Div), "display") == "none") {
+                dojo.style(dojo.byId(Div), "display", "block");
+                dojo.fadeIn({ node: dojo.byId(Div) }).play();
+            } else {
+                dojo.style(dojo.byId(Div), "display", "none");
+                dojo.fadeIn({ node: dojo.byId(Div) }).play();
+            }
+            if (dojo.style(dojo.byId("loginWindow"), "display") == "none" && dojo.style(dojo.byId("AdditionalDiv"), "display") == "none") {
+                dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar", "OptionToolbar2");
+            } else {
+                dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar2", "OptionToolbar");
+            }
+        }
+    </script>
+    <!--
+        Change Name/image DIV
+    -->     
+    <script>
+        function ChangeName() {
+            if (token != "") {
+                dojo.byId('lockIcon').className = "ToolbarToggleButton UnlockImage";
+                dojo.byId('tlogin').disabled = true;
+                dojo.byId('tpass').disabled = true;
+                dojo.byId('inputOutput').value = "Выйти";
+            } else {
+                dojo.byId('lockIcon').className = "ToolbarToggleButton lockImage";
+                dojo.byId('inputOutput').value = "Войти";
+                dojo.byId('tlogin').disabled = false;
+                dojo.byId('tpass').disabled = false;
+                dojo.byId('tpass').value = '';
+            }
+        }
+    </script>
+    <!--
+        Move TimeSlider
+    -->    
+    <script>
+        var dragapproved = false
+        var sCur
+        var ie5 = document.all && document.getElementById
+        var ns6 = document.getElementById && !document.all
+
+        function drag_dropRB(e) {
+            if (ie5 && dragapproved && event.button == 1) {
+                document.getElementById(sCur).style.right = tempx - (event.clientX - offsetx) + "px"
+                document.getElementById(sCur).style.bottom = tempy - (event.clientY - offsety) + "px"
+            }
+            else if (ns6 && dragapproved) {
+                document.getElementById(sCur).style.right = tempx - (e.clientX - offsetx) + "px"
+                document.getElementById(sCur).style.bottom = tempy - (e.clientY - offsety) + "px"
+            }
+        }
+
+        function initializedragRB(e, cur) {
+            sCur = cur
+            offsetx = ie5 ? event.clientX : e.clientX
+            offsety = ie5 ? event.clientY : e.clientY
+            tempx = parseInt(document.getElementById(cur).style.right)
+            tempy = parseInt(document.getElementById(cur).style.bottom)
+
+            dragapproved = true
+            document.onmousemove = drag_dropRB
+        }
+
+        function stopdrag() {
+            dragapproved = false;
+            document.getElementById(sCur).onmousemove = null;
+        }
+
+    </script>
+
+    <!--
+        TabBar Control
+    -->
+
+    <style>
+        #tabs {
+            position:absolute;
+            padding: 0px; 
+            margin:0px 4px 4px 4px; 
+            clear: both; 
+            width: 247px;
+            height:auto;
+            bottom:0px;
+            top: 24px;             
+            border-top:    0px solid #000;
+            border-right:  1px solid #000;
+            border-bottom: 1px solid #000;
+            border-left:   1px solid #000;
+            border-bottom-right-radius:5px;
+            border-bottom-left-radius:5px;
+        }
+        #tabs-title { 
+            padding: 0px; 
+            margin:4px 4px 0px 4px; 
+            clear: both; 
+            width: 249px; 
+            border: 0px solid #000;
+            text-align: center;
+            background-color:transparent;
+            height: 20px;
+        }
+        .tab-title {
+            background-color:transparent;
+            width:81px; 
+            cursor: pointer; 
+            margin: 0px; 
+            padding: 0px; 
+            list-style: none; 
+            float: left; 
+            border-top:    1px solid #000;
+            border-right:  1px solid #000;
+            border-bottom: 1px solid #000;
+            border-left:   1px solid #000;
+            border-top-right-radius:5px;
+            border-top-left-radius:5px;
+        }
+        .selected-li{
+            border-bottom: 0px solid #CCC;
+        }
+        #tabs-title li:hover {
+            text-decoration: underline;
+        }
+        .tab { 
+            padding: 10px; 
+            display: none; 
+            background-color:transparent; 
+            text-align: justify;
+        }
+        .selected { display: block; }
+        ul.ulSettings {
+            margin-top: 0px;
+            margin-left: 0px;
+            padding: 0;
+            list-style: none;
+        }
+        ul.ulSettings li {
+            margin-bottom: 5px;
+        }
+        ul.ulSettings li ul {
+            margin-top: 0px;
+            margin-left: 10px;
+            padding: 0;
+            list-style: none;
+        }
+
+    </style>  
+    <script type="text/javascript">
+        var tabCount = 3;
+        function SelectTab(idx) {
+            for (var i = 1; i <= tabCount; ++i) {
+                var _tab = document.getElementById("tab" + i);
+                var _tabTitle = document.getElementById("tab-title" + i);
+                if (idx != i) {
+                    _tab.setAttribute("class", "tab");
+                    _tabTitle.setAttribute("class", "tab-title");
+                }
+                else {
+                    _tab.setAttribute("class", "tab selected");
+                    _tabTitle.setAttribute("class", "tab-title selected-li");
+                }
+            }
+        }
+
+        function TWSelUnSel(Papa, Group) {            
+            var elG = document.getElementById(Group);
+            var elP = document.getElementById(Papa);
+            if ( elG.classList.contains("selected"))
+            {
+                elG.setAttribute("class", "tree-view");
+                elP.setAttribute("class", "arr");
+            }
+            else
+            {
+                elG.setAttribute("class", "selected");
+                elP.setAttribute("class", "ard");
+            }
+        }
+    </script> 
+  
+    <!--
+        GetSend Token
+    -->
+    <script type="text/javascript">
+        var token = "";
+
+        function GetToken() {
+            if (dojo.byId('inputOutput').value == "Войти") {
+                var a = document.getElementById("tlogin").value; // Считываем значение a
+                var b = document.getElementById("tpass").value; // Считываем значение b
+                var xmlhttp = getXmlHttp(); // Создаём объект XMLHTTP
+                //url
+
+                xmlhttp.open('POST', ip_serv + "arcgis/tokens/generateToken", true); // Открываем асинхронное соединение
+
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // Отправляем кодировку
+                xmlhttp.send("request=getToken&username=" + encodeURIComponent(a) + "&password=" + encodeURIComponent(b) + "&expiration=1440&client=requestip"); // Отправляем POST-запрос
+                xmlhttp.onreadystatechange = function () { // Ждём ответа от сервера
+                    if (xmlhttp.readyState == 4) { // Ответ пришёл
+                        if (xmlhttp.status == 200) { // Сервер вернул код 200 (что хорошо)
+                            //document.getElementById("summa").innerHTML = xmlhttp.responseText; // Выводим ответ сервера
+                            //alert(xmlhttp.responseText);
+                            token = xmlhttp.responseText;
+                            SetLayers();
+                            ChangeName();
+                        }
+                    }
+                };
+            } else {
+                token = "";
+                SetLayers();
+                ChangeName();
+            }
+            ChangeName();
+        }
+
+        Date.prototype.AddHours = function (h) {
+            this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+            return this;
+        }
+        
+    </script>
+  </head>
+
+  <body>
+    <div id="map"
+            data-dojo-type="dijit/layout/ContentPane" 
+            data-dojo-props="region:'center'" 
+            style="overflow:hidden;">
+
+        <img src="images/i_tools.png" style="height:30px; width:30px; position:absolute; right:0px; top:0px; z-index:55" /> <!--onclick="ShowHideWindow('MainToolbar')"--> 
+        <div id="MainToolbar" class="CommonBorder BackgroundBorder">
+<!--            <img src="images/i_tools.png" style="height:30px; width:30px; margin:-5px; position:absolute; right:-5px;"/>           --> 
+            <ul class="ulMain">
+                <li><img src="images/print_printer.png" title="Печать"            class="ToolbarToggleButton"/></li>
+                <li><img src="images/i_clock.png"       title="Временная шкала"   onclick="ShowHideWindow('timeWindow');" class="ToolbarToggleButton"/></li>
+                <li><img src="images/i_clickglobe.png"  title="Базовая карта"     class="ToolbarToggleButton"/>
+                    <ul>
+                        <li>
+                            <div id="basemapGalleryWindow" class="CommonBorder BackgroundBorder">
+                                <div id="basemapGalleryDiv" style="margin-left: 15px; margin-right: auto;"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li><img src="images/i_legend.png"      title="Легенда"           onclick="ShowHideWindow('legendWindow');"       class="ToolbarToggleButton"/></li>
+                <li><img src="images/i_overview.png"    title="Обзор карты"       onclick="ShowHideWindow('overviewMapWindow');"  class="ToolbarToggleButton"/></li>
+            </ul>            
+        </div>
+
+        <div id="OptionToolba" class="OptionToolbar2 CommonBorder BackgroundBorder">
+            <p style="margin-top:10px; margin-left:50px; font-size:14px;">Портал Амур</p>
+            <img style="position:absolute; top:0px; right:40px;" src="images/i_list.png" alt="Вкл/Выкл панель выбора имеющихся данных" class="ToolbarToggleButton" onclick="ShowHideWindow('AdditionalDiv');"/>
+            <div id="lockIcon" style="position:absolute; top:0px; right:5px;" class="ToolbarToggleButton lockImage" onclick="ShowHideWindow('loginWindow');"></div>
+        </div>
+        <img src="images/logo.png" style="position:absolute; z-index:65; width:57px; height:55px; left:0px; top:0px" /> <!--onclick="ShowHideWindow('OptionToolbar')"-->
+                
+        <div id="AdditionalDiv" class="CommonBorder BackgroundBorder">
+            <ul id="tabs-title">
+                <li id="tab-title1" onclick="SelectTab(1);" class="tab-title selected-li">Продукты</li>
+                <li id="tab-title2" onclick="SelectTab(2);" class="tab-title">Настройка</li>
+                <li id="tab-title3" onclick="SelectTab(3);" class="tab-title">Поиск</li>
+            </ul>
+            <div id="tabs">
+                <!-- Список продуктов и дат -->
+                <div class="tab selected" id="tab1" style="height:100%">
+                    <div id="divDates" class="ProductStyle"></div>
+                </div>
+                <!-- Настройки -->
+                <div class="tab ProductStyle" id="tab2">
+                    <ul class="ulSettings ProductStyle">
+                        <li><input type="checkbox" name="visLayers" id="cbBorders"/>Границы
+                            <ul>
+                                <li><input type="checkbox" name="visLayers" id="cbGosg"/>Государственные</li>
+                                <li><input type="checkbox" name="visLayers" id="cbAdm1"/>Адм. 1 порядка</li> 
+                                <li><input type="checkbox" name="visLayers" id="cbAdm2"/>Адм. 2 порядка</li>
+                            </ul>
+                        </li>
+                        <li><input type="checkbox" name="visLayers" id="cbRestricted"/>Охраняемые территории
+                            <ul>
+                                <li><input type="checkbox" name="visLayers" id="cbZP"/>Заповедники</li>
+                                <li><input type="checkbox" name="visLayers" id="cbNP"/>Национальные парки</li>
+                                <li><input type="checkbox" name="visLayers" id="cbFZ"/>Федеральные заказники</li>
+                            </ul>
+                        </li>
+                        <li><input type="checkbox" name="visLayers" id="cbCity"/>Города
+                            <ul>
+                                <li><input type="radio" name="grCity" id="cbChis" checked="checked"/>По числености</li>
+                                <li><input type="radio" name="grCity" id="cbStatus"/>По статусу</li>
+                            </ul>
+                        </li> 
+                        <li><input type="checkbox" name="visLayers" id="cbRivers"/>Гидрологические объекты</li>
+                        <li><input type="checkbox" name="visLayers" id="cbRoads"/>Авто- и жд- дороги</li>
+                        <li><input type="checkbox" name="visLayers" id="cbShoreline"/>Береговая линия</li>
+                    </ul>
+                </div>
+                <!-- Поиск -->
+                <div class="tab" id="tab3" style="height:100%">
+                    <input type="text" id="address"/>
+                    <!--<div id="result" style="width:600px; height:300px; overflow-y:scroll;"></div>-->
+                    <input  class="SearchButton" type="button" onclick="executeQuerySearch(dojo.byId('address').value);" />
+                    <!--<img id="locate" src="images/icons/search.png" style="float:right; cursor:pointer"/>-->
+                        <!--<button class="myIcon" id="locate" data-dojo-type="dijit/form/Button">найти</button>--> 
+                    <div id="divSearchResult" style="width:auto; height:95%; overflow-y:auto;"></div>
+                </div>
+            </div>                       
+        </div>
+
+        <div id="SelProdToolbar" class="CommonBorder BackgroundBorder">
+            <ul class="menu" >
+            <!--<ul class="menu" >-->
+                <li>
+                    <div title="Спутниковые Данные" id="icSat" class="MenuButton"></div>
+                    <ul id="TabBorderSat" class ="BackgroundBorder">
+                        <li><div class="arr" id="twPSat" onclick="TWSelUnSel('twPSat', 'twSat')"></div>Космические снимки</li>
+                            <div id="twSat" class="tree-view">
+                                <ul>
+                                    <li><input type="checkbox" name="visLayers" id="cbModis"/>TERRA/AQUA (MODIS)</li> 
+                                    <li><input type="checkbox" name="visLayers" id="cbMeteor1"/>Метеор-М №1 (КМСС)</li>
+                                    <li><input type="checkbox" name="visLayers" id="cbKanopus"/>Канопус-В (МСС)</li>
+                                    <li><input type="checkbox" name="visLayers" id="cbLandsat8"/>Landsat 8 (OLI)</li> 
+                                    <li><input type="checkbox" name="visLayers" id="cbResursp"/>Ресурс-П №1 (ШМСА)</li> 
+                                </ul>
+                            </div>
+                        
+                        <li><input type="checkbox" name="visLayers" id="cbFloodPolygons"/>Вектора разливов рек</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowMap"/>Карты снежного покрова</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowBorders"/>Граница снежного покрова</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbMTSAT"/>Облачность</li>
+                        <li><input type="checkbox" name="visLayers" id="cbAscat"/>Влажность почвы</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Гидрологическая информация с постов" id="icHyd" class="MenuButton"></div>
+                    <ul id="TabBorderHyd" class="BackgroundBorder">
+                        <li><input type="checkbox" name="visLayers" id="cbWaterLevel"/>Уровни воды</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowDepth"/>Высота снега (КН-01)</li>
+                        <li><input type="checkbox" name="visLayers" id="cbSnowDepth24"/>Высота снега (КН-24)</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Метеорологическая информация с постов" id="icMet" class="MenuButton"></div>            
+                    <ul id="TabBorderMet" class="BackgroundBorder">
+                        <li><input type="checkbox" name="visLayers" id="cbMeteo"/>Температура, давление</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbWindSpeed"/>Скорость ветра</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherEvent"/>Погодные явления</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherEventCol"/>Погодные явления цвет</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherTmpIso"/>Температура изолинии</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherPresIso"/>Давление изолинии</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Прогнастические данные" id="icFor" class="MenuButton"></div>            
+                    <ul id="TabBorderFor" class="BackgroundBorder">                        
+                        <li><div class="arr" id="twPWRF" onclick="TWSelUnSel('twPWRF', 'twWRF')"></div><input type="checkbox" name="visLayers" id="cbGRIB"/>Прогностические данные</li>
+                        <div id="twWRF" class="tree-view">
+                            <ul>
+                                <li>Геопотенциал<br/>
+                                    <input type="checkbox" name="visLayers" id="cbHGTIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbHGTField"/>Поля
+                                </li>
+                                <li>Температура<br/>
+                                    <input type="checkbox" name="visLayers" id="cbTMPIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbTMPField"/>Поля
+                                </li>
+                                <li>Влажность<br/>
+                                    <input type="checkbox" name="visLayers" id="cbRHIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbRHField"/>Поля
+                                </li>
+                                <li>Давление (ур. моря)<br/>
+                                    <input type="checkbox" name="visLayers" id="cbPRMSLIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbPRMSLField"/>Поля
+                                </li>
+                                <li><input type="checkbox" name="visLayers" id="cbGRIBWind"/>Скорость и направление ветра</li>
+                            </ul>
+                        </div>
+                        <li><input type="checkbox" name="visLayers" id="cbFloodPred"/>Расчет разливов по станциям</li>
+                        <li><div class="arr" id="twPZVM" onclick="TWSelUnSel('twPZVM', 'twZVM')"></div><input type="checkbox" name="visLayers" id="cbZeyaForecast"/>Зейское вдхр.</li>
+                        <div id="twZVM" class="tree-view">
+                            <ul>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaCOSMO"/>модель COSMO</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaNCEP"/>модель NCEP</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaUKMO"/>модель UKMO</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaJMA"/>модель JMA</li>
+                            </ul>
+                        </div>
+                        <li><input type="checkbox" name="visLayers" id="cbLevelForecast"/>Прогноз уровней воды</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div id="overviewMapWindow" class="moveable_omap BackgroundBorder" dojoType="dojo/dnd/Moveable">
+            <img src="images/i_overview.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
+            <div style="text-align:center;"> Обзор карты </div>
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('overviewMapWindow');"/>            
+            <div id="overviewMapDiv" style="width:100%; height:90%; "></div>
+        </div>
+
+        <div id="legendWindow" class="moveable BackgroundBorder" dojoType="dojo/dnd/Moveable">
+            <img src="images/i_legend.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
+            Легенда карты
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('legendWindow');"/>            
+            <div id="legendDiv"></div>
+        </div>
+
+        <div id="timeWindow" class="CommonBorder BackgroundBorder" style="position:absolute;right:10px;bottom:10px;" onSelectStart="return false">
+            <div class="movTLIcon" onMousedown="initializedragRB(event,'timeWindow')" onMouseup="stopdrag()"></div>
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px; z-index:46;" onclick="ShowHideWindow('timeWindow');"/>
+            <div id="timeInfo">
+
+                <div id="fastcal" class="fastcalendar BackgroundBorder">
+                    День:
+                    <input class="fc_inputs" type="text" value="1" id="fc_day" readonly="true" />
+                    <table style="display: inline-block;vertical-align: middle;">
+                        <tr> <td> <span class="arrup"   style="margin:0px 0px;vertical-align: bottom;" onclick="fc_onupDay();"> </span></td> </tr>
+                        <tr> <td> <span class="arrdown" style="margin:0px 0px;vertical-align: top;"    onclick="fc_ondwnDay();"></span></td> </tr>
+                    </table>
+
+                    &nbsp Месяц:
+                    <input class="fc_inputs" type="text" value="1" id="fc_month" readonly="true" />
+                    <table style="display: inline-block;vertical-align: middle;">
+                        <tr> <td> <span class="arrup"   style="margin:0px 0px;vertical-align: bottom;" onclick="fc_onupMonth();"> </span></td> </tr>
+                        <tr> <td> <span class="arrdown" style="margin:0px 0px;vertical-align: top;"    onclick="fc_ondwnMonth();"></span></td> </tr>
+                    </table>
+                    &nbsp Год:                   
+                    <input  class="fc_inputs" style="width: 50px;" type="text" value="2015" id="fc_year" readonly="true" />
+                    <table style="display: inline-block;vertical-align: middle;">
+                        <tr> <td> <span class="arrup"   style="margin:0px 0px;vertical-align: bottom;" onclick="fc_onupYear();"> </span></td> </tr>
+                        <tr> <td> <span class="arrdown" style="margin:0px 0px;vertical-align: top;"    onclick="fc_ondwnYear();"></span></td> </tr>
+                    </table>
+                    &nbsp Срок:
+                    <input class="fc_inputs" type="text" value="0" id="fc_hour" readonly="true" />
+                    <table style="display: inline-block;vertical-align: middle;">
+                        <tr> <td> <span class="arrup"   style="margin:0px 0px;vertical-align: bottom;" onclick="fc_onupHour();"> </span></td> </tr>
+                        <tr> <td> <span class="arrdown" style="margin:0px 0px;vertical-align: top;"    onclick="fc_ondwnHour();"></span></td> </tr>
+                    </table>
+                    &nbsp&nbsp
+                    <span class="btn-ok" onclick="fc_Ok();" id="fc_btOk"></span>
+                    <span class="close" style="position: absolute; top: 2px; right: 2px;" onclick="fc_Hide();"></span>
+                </div>
+
+                <div>Данные с <input type="text" id="tDTStart" class="dtp_input" value="01-01-2015 00:00:00" readonly="true" onclick="fc_Hide();"> периодичностью (
+                    <select id="intervals" class="selecttrans">
+                        <option value=1 selected>1 час</option>
+                        <option value=3 >3 часа</option>
+                        <option value=6 >6 часов</option>
+                        <option value=12 >12 часов</option>
+                        <option value=24 >24 часа</option>
+                    </select>)
+                    <img id="btnRefTime" src="images/icons/redo_i.png" style="width:25px; height:22px; margin-left:10px; margin-bottom:-6px; cursor:pointer;"/>
+                </div>
+                <div id="timeSliderDiv"></div>            
+            </div>    
+        </div>
+
+        <div id="loginWindow" class="CommonBorder BackgroundBorder" style="position:absolute; left:70px; top:42px; height:80px; width:180px; padding:10px 3px 10px 3px; z-index:55;" >
+            <table>
+                <tr><td>Логин</td><td><input type="text" style="width:100%;" id="tlogin"></td></tr>
+                <tr><td>Пароль</td><td><input type="Password" style="width:100%;" id="tpass"></td></tr>
+                <tr><td colspan="2"><input id="inputOutput" type="button" style="width:100%;" value="Войти" onclick="GetToken(); ShowHideWindow('loginWindow');" /></td></tr>
+            </table>
+        </div>
+
+        <div id="AboutImage" class="CommonBorder BackgroundBorder">
+            <img id="Img1" src="images/about.png" style="height:200px; width:500px; margin-left:10px; margin-bottom:-6px; cursor:pointer;"/>
+            <div class="progress-bar silver glow">
+                <span id="progBar" style="width: 0%"></span>
+            </div>
+            <a href="http://www.dvrcpod.ru/" title="ДЦ ФГБУ &quot;НИЦ &quot;Планета&quot;" target="_blank" style="position:absolute; margin:220px; margin-top:-40px; z-index:60;">www.dvrcpod.ru</a>
+            <a href="http://khabmeteo.ru/" title="ФГБУ &quot;Дальневосточное УГМС&quot;" target="_blank" style="position:absolute; margin:225px; margin-top:-150px; z-index:60; background:url(khabmeteo.ru);">khabmeteo.ru</a>
+        </div>
+
+        <div id="InfoWindow" class="CommonBorder BackgroundBorder">            
+        </div>
+        <div id="InfoTriangle" class="triangleRight"></div>
+
+    </div>
+  </body>
+</html>
