@@ -152,19 +152,20 @@ function initSlider() {
     map.setTimeSlider(timeSlider);
 
     var tmp_date = (new Date()).AddHours(-24);
-    document.getElementById("tDTStart").value = DateToString(tmp_date);
     document.getElementById("fc_day").value = tmp_date.getUTCDate();
     document.getElementById("fc_month").value = 1 + tmp_date.getUTCMonth();
     document.getElementById("fc_year").value = tmp_date.getUTCFullYear();
     document.getElementById("fc_hour").value = tmp_date.getUTCHours();
+    document.getElementById("tDTStart").value = ("0" + tmp_date.getUTCDate()).slice(-2) + "-" +
+                                                ("0" + tmp_date.getUTCMonth()).slice(-2) + "-" +
+                                                fc_year.value + " " +
+                                                ("0" + tmp_date.getUTCHours()).slice(-2) + ":00:00";
 
     var stT = new Date(tmp_date);
     var stI = dojo.byId("intervals").value;
     var CInt = 24;
     var endT = new Date(stT.getTime() + CInt * stI * 3600000);
     var timeExtent = new esri.TimeExtent(stT, endT);
-    // timeExtent.startTime = stT;
-    // timeExtent.endTime = endT;
 
 
     timeSlider.setThumbCount(2);
@@ -230,24 +231,21 @@ function initSlider() {
 function refreshSlider() {
     if (dojo.byId("tDTStart") == null || timeSlider == null)
         return;
-    
-	var tmp_date = (new Date()).AddHours(-24);
-    document.getElementById("tDTStart").value = DateToString(tmp_date);
-    document.getElementById("fc_day").value = tmp_date.getUTCDate();
-    document.getElementById("fc_month").value = 1 + tmp_date.getUTCMonth();
-    document.getElementById("fc_year").value = tmp_date.getUTCFullYear();
-    document.getElementById("fc_hour").value = tmp_date.getUTCHours();
+    var ft = dojo.byId("tDTStart").value.substring(6, 10) + "-" + dojo.byId("tDTStart").value.substring(3, 5) + "-" + dojo.byId("tDTStart").value.substring(0, 2) + "T" + dojo.byId("tDTStart").value.substring(11) + "Z";
 
-    var stT = new Date(tmp_date);
+    var stT = new Date(ft);
     var stI = dojo.byId("intervals").value;
     var CInt = 24;
     var endT = new Date(stT.getTime() + CInt * stI * 3600000);
     var timeExtent = new esri.TimeExtent(stT, endT);
 
+
     timeSlider.setThumbCount(2);
     timeSlider.createTimeStopsByTimeInterval(timeExtent, stI, "esriTimeUnitsHours");
     timeSlider.setThumbIndexes([0, 1]);
     timeSlider.setThumbMovingRate(2000);
+
+    timeSlider.startup();
 
     //add labels for every other time stop
     var labels = dojo._base.array.map(timeSlider.timeStops, function (timeStop, i) {
@@ -260,6 +258,7 @@ function refreshSlider() {
     });
 
     timeSlider.setLabels(labels);
+
 
     //Run getDates
     var dde = endT.getUTCFullYear() + "-" + ("0" + (endT.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + endT.getUTCDate()).slice(-2) + " " + ("0" + endT.getUTCHours()).slice(-2) + ":00:00";

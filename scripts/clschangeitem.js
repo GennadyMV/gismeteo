@@ -1,4 +1,4 @@
-﻿dojo.require("esri.map");
+﻿/*dojo.require("esri.map");
 dojo.require("esri.layers.agsdynamic");
 dojo.require("esri.layers.LayerDrawingOptions");
 dojo.require("esri.renderers.SimpleRenderer");
@@ -6,8 +6,9 @@ dojo.require("esri.symbols.SimpleLineSymbol");
 
 dojo.require("esri.layers.ArcGISImageServiceLayer");
 dojo.require("esri.layers.RasterFunction");
-
-dojo.ready(function () {
+*/
+//dojo.ready(function () {
+function initclsChangeItemDMSL() {
     dojo.declare("dcrscplaneta.clsChangeItemDMSL", esri.layers.ArcGISDynamicMapServiceLayer, {
         mLevel: "",
         cLevel: 3,
@@ -30,4 +31,5 @@ dojo.ready(function () {
             this.setLayerDrawingOptions(layerDrawingOptions);
         }
     });
-});
+}
+//});
