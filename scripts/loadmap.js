@@ -230,11 +230,15 @@ function initSlider() {
 function refreshSlider() {
     if (dojo.byId("tDTStart") == null || timeSlider == null)
         return;
-    var ft = dojo.byId("tDTStart").value.substring(3, 5) + "-" + dojo.byId("tDTStart").value.substring(0, 2) + "-" + dojo.byId("tDTStart").value.substring(6) + " UTC";
-    var year = ft.slice(6, 10);
-    var month = ft.slice(3, 5) - 1;
-    var day = ft.slice(0, 2);
-    var stT = new Date(ft);
+    
+	var tmp_date = (new Date()).AddHours(-24);
+    document.getElementById("tDTStart").value = DateToString(tmp_date);
+    document.getElementById("fc_day").value = tmp_date.getUTCDate();
+    document.getElementById("fc_month").value = 1 + tmp_date.getUTCMonth();
+    document.getElementById("fc_year").value = tmp_date.getUTCFullYear();
+    document.getElementById("fc_hour").value = tmp_date.getUTCHours();
+
+    var stT = new Date(tmp_date);
     var stI = dojo.byId("intervals").value;
     var CInt = 24;
     var endT = new Date(stT.getTime() + CInt * stI * 3600000);
