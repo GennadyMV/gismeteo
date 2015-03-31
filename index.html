@@ -3,211 +3,73 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
-    
+
     <title>ГИС ДВ</title>      
     <link rel="Shortcut Icon" type="image/x-icon" href="images/sat.ico" /> 
-
+    
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
   
-     <!--  
+    
       
-    <link rel="stylesheet" type="text/css" href="http://10.8.3.191/scripts/3.12/dijit/themes/tundra/tundra.css"/>
-    <link rel="stylesheet" type="text/css" href="http://10.8.3.191/scripts/3.12/esri/css/esri.css" />
-    <script type="text/javascript" src="http://10.8.3.191/scripts/3.12/init.js"></script> 
-      
-         -->
 
-      <link rel="stylesheet" type="text/css" href="http://www.meteo-dv.ru/esri/3.12/dijit/themes/tundra/tundra.css"/>
-         <link rel="stylesheet" type="text/css" href="http://www.meteo-dv.ru/esri/3.12/esri/css/esri.css" />
-         <script type="text/javascript" src="http://www.meteo-dv.ru/esri/3.12/init.js"></script> 
+      <link rel="stylesheet" type="text/css" href="esri/3.12/dijit/themes/tundra/tundra.css"/>
+         <link rel="stylesheet" type="text/css" href="esri/3.12/esri/css/esri.css" />
+         <script type="application/javascript" src="esri/3.12/init.js"></script> 
+       <!--  
+   
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/dijit/themes/tundra/tundra.css"/>
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/esri/css/esri.css" />
+    <script type="application/javascript" src="http://10.8.6.5/scripts/3.12/init.js"></script> 
 
- 
+       -->
+
+
 
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/legend.css">
-    
+
+    <script type="application/javascript" src="scripts/globe.js"></script>
+
     <!--
-        Create WMS
+        Include scripts
     -->    
-    <script type="text/javascript" src="scripts/clschangeitem.js"></script>
-    <script type="text/javascript" src="scripts/legend.js"></script>
-    <script type="text/javascript" src="scripts/lineEditor.js"></script>
-    <script type="text/javascript" src="scripts/DatesSelector.js"></script>
-    <script type="text/javascript" src="scripts/dcrscplanetaclass.js"></script>
-    <script src="scripts/timeslider.js"></script>
-    <script src="scripts/setlayers.js"></script>
-    <script src="scripts/basemaps.js"></script>
-    <script src="scripts/loadmap.js"></script>
-    <script type="text/javascript" src="scripts/FastCalendar.js"></script>    
-        
-    
-    <script type="text/javascript" src="scripts/clsInfo.js"></script>
-    <script src="lib/d3/d3.js"></script>
-    <script src="conrec.js"></script>
+
+    <script type="application/javascript" src="scripts/loadMap.js"></script>
+    <script type="application/javascript" src="scripts/viewMap.js"></script>
+    <script type="application/javascript" src="scripts/legend.js"></script>    
+    <script type="application/javascript" src="scripts/DatesSelector.js"></script>
+    <script type="application/javascript" src="scripts/dcrscplanetaclass.js"></script>
+    <script type="application/javascript" src="scripts/search.js"></script>    
+    <script type="application/javascript" src="scripts/FastCalendar.js"></script>
+    <script type="application/javascript" src="scripts/clsInfo.js"></script>
+    <script type="application/javascript" src="scripts/hpsel.js"></script>
+    <script type="application/javascript" src="scripts/countours/d3.js"></script>
+    <script type="application/javascript" src="scripts/countours/conrec.js"></script>
     <!--
         Load map
     -->
     <script>
-
-
-        //   var ip_serv = "http://10.8.3.191/";  //их локалака (прокси)
-       var ip_serv = "http://www.meteo-dv.ru/"; // инет
-
-
-        var layer, map, visible = [];
-        var timeSlider;
-        var scalebar;
-
+        
         dojo.ready(function () {
-                        
-           initLineDitor();
-           initWMSLayer();
-           initDatesSelector();
-           initMap();
-        });          
-
+            initInfo();            
+            initDatesSelector();
+            initAddClasses();            
+            initMap();
+            initAddClass();
+        });
 
         //после загрузки всего документа запускается следующий код
         window.onload = function () {
-
             
             dojo.on(dojo.dom.byId("btnRefTime"), "click", refreshSlider);
             dojo.on(dojo.dom.byId("intervals"), "change", refreshSlider);
-
         };
-
-    </script>
-
-    <!--
-        Search task
-    -->
-    <script>        
-        var queryTaskSearch;
-        var querySerch;
-        var fSetSearch;
-
-        require(["esri/tasks/QueryTask", "esri/tasks/query"], function (QueryTask, Query) {
-            queryTaskSearch = new QueryTask(ip_serv + "arcgis/rest/services/attrib/statsearch/MapServer/0");
-            querySearch = new Query();
-            querySearch.returnGeometry = true;
-            querySearch.outFields = ["name", "id", "station_ty"];
-        });
-
-        function executeQuerySearch(name) {
-            querySearch.where = "UPPER(NAME) LIKE UPPER('" + name + "%') OR id LIKE UPPER('" + name + "%')";
-            queryTaskSearch.execute(querySearch, showResults);
-        }
-
-        dojo.require("esri.symbols.PictureMarkerSymbol");
-        dojo.require("esri.graphic");
-        dojo.require("esri.renderers.SimpleRenderer");
-        function zoom2Search(index) {
-            var geom = fSetSearch[index].geometry;
-            if (geom !== undefined) {
-                map.centerAndZoom(geom, 12);
-                var symbol = new esri.symbols.PictureMarkerSymbol("images/esri_icon.png", 23, 34);
-                var graphic = new esri.graphic(geom, symbol);
-                map.graphics.add(graphic);
-                window.setTimeout(function () { map.graphics.clear() }, 10000);
-            }
-        }
-
-        function showResults(featureSet) {
-            fSetSearch = featureSet.features;
-            var container = dojo.byId("divSearchResult");
-            //clear old
-            while (container.firstChild) {
-                container.removeChild(container.firstChild);
-            }
-            var listElement = document.createElement("ul");
-            listElement.style.listStyle = "none";
-            listElement.style.padding = "0px";
-            listElement.className = "elLegend";
-
-            container.appendChild(listElement);
-            var resultFeatures = featureSet.features;
-            for (var i = 0, il = resultFeatures.length; i < il; i++) {
-                var graphic = resultFeatures[i];
-                var listItem = document.createElement("li");
-                listItem.className = "listation";
-                var type = "";
-                if (graphic.attributes.station_ty == 1) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/>"; }
-                if (graphic.attributes.station_ty == 2) { type = "<img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
-                if (graphic.attributes.station_ty == 3) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/> <img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
-                if (graphic.attributes.station_ty == 4) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/>"; }
-                if (graphic.attributes.station_ty == 5) { type = "<img class=\"legimg\" src=\"images/search/hyd.png\"/> <img class=\"legimg\" src=\"images/search/met.png\"/>"; }
-                if (graphic.attributes.station_ty == 6) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/><img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
-                if (graphic.attributes.station_ty == 7) { type = "<img class=\"legimg\" src=\"images/search/met.png\"/><img class=\"legimg\" src=\"images/search/hyd.png\"/><img class=\"legimg\" src=\"images/search/snow.png\"/>"; }
-                if (graphic.attributes.station_ty == 8) { type = "<img class=\"legimg\" src=\"images/search/smallSity.png\"/>"; }
-                if (graphic.attributes.station_ty == 9) { type = "<img class=\"legimg\" src=\"images/search/bigSity.png\"/>"; }
-                if (graphic.attributes.station_ty == 10) { type = "<img class=\"legimg\" src=\"images/search/river.png\"/>"; }
-                if (graphic.attributes.station_ty == 11) { type = "<img class=\"legimg\" src=\"images/search/lake.png\"/>"; }
-                if (graphic.attributes.station_ty == 1 || graphic.attributes.station_ty == 2 || graphic.attributes.station_ty == 3 || graphic.attributes.station_ty == 4 || graphic.attributes.station_ty == 5 || graphic.attributes.station_ty == 6 || graphic.attributes.station_ty == 7) {
-                    listItem.innerHTML = type + graphic.attributes.name + "<br/>" + "   index: ".bold() + graphic.attributes.id;
-                } else {
-                    listItem.innerHTML = type + graphic.attributes.name;
-                }
-                
-                //listItem.addEventListener('click', function (i) {
-                //    if (fSetSearch[i].geometry !== undefined) {
-                //        map.centerAndZoom(fSetSearch[i].geometry, 12);
-                //    }
-                //});
-                //listElement.onclick = function () { return zoom2Search(i + ''); };
-                listItem.setAttribute('onClick', 'zoom2Search(' + i + ')');
-                listElement.appendChild(listItem);
-            }
-        }
-    
-        dojo.require("esri.tasks.query");
-
-        function getDates(id, url, ds, de) {
-            var queryTask = new esri.tasks.QueryTask(url);            
-            var query = new esri.tasks.Query();
-            query.returnGeometry = false;
-            query.text = id;
-            query.outFields = ["datadatetime"];
-            query.orderByFields = ["datadatetime"];            
-            query.returnDistinctValues = true;
-
-            //var dde = de.getFullYear() + "-" + ("0" + (de.getMonth() + 1)).slice(-2) + "-" + ("0" + de.getDate()).slice(-2) + " " + ("0" + de.getHours()).slice(-2) + ":00:00";
-            //var dds = ds.getFullYear() + "-" + ("0" + (ds.getMonth() + 1)).slice(-2) + "-" + ("0" + ds.getDate()).slice(-2) + " " + ("0" + ds.getHours()).slice(-2) + ":00:00";
-            query.where = "datadatetime between '" + ds + "' AND '" + de + "'";
-            
-            queryTask.execute(query, function mf(evt) { getDatesResult(id, evt) }, errorDates);
-        }
-        function getDatesResult(id, featureSet) {
-            var dates = [];
-            for (var i = 0; i < featureSet.features.length; i++) {
-                dates.push(new Date(featureSet.features[i].attributes.datadatetime));
-            }
-            var container = dojo.byId("divDates");
-            //clear old
-            //while (container.firstChild) {
-            //    container.removeChild(container.firstChild);
-            //}
-            var title = document.createElement("p");
-            title.innerText = id;
-            container.appendChild(title);
-            var listElement = document.createElement("ul");
-            container.appendChild(listElement);            
-            for (var i = 0; i < dates.length;  i++) {                
-                var listItem = document.createElement("li");
-                listItem.innerHTML = dates[i];
-                listElement.appendChild(listItem);
-            }
-            
-        }
-        function errorDates(errSet) {
-            var kk = 9;
-        }
-
     </script>
     <!--
         Check Boxes
     -->
-    <script src="scripts/selectlayer.js"></script>  
+    <script type="application/javascript" src="scripts/selectlayer.js"></script>  
     <!--
         Show\Hide DIV
     -->     
@@ -284,7 +146,7 @@
 
     </script>
 
-    <!--
+    <!-- 
         TabBar Control
     -->
 
@@ -401,6 +263,7 @@
 
         function GetToken() {
             if (dojo.byId('inputOutput').value == "Войти") {
+                dojo.style(dojo.byId("AboutImage"), "display", "block");
                 var a = document.getElementById("tlogin").value; // Считываем значение a
                 var b = document.getElementById("tpass").value; // Считываем значение b
                 var xmlhttp = getXmlHttp(); // Создаём объект XMLHTTP
@@ -443,7 +306,7 @@
             data-dojo-props="region:'center'" 
             style="overflow:hidden;">
 
-        <img src="images/i_tools.png" style="height:30px; width:30px; position:absolute; right:0px; top:0px; z-index:55" /> <!--onclick="ShowHideWindow('MainToolbar')"--> 
+        <img src="images/i_tools.png" style="height:30px; width:30px; position:absolute; right:0px; top:0px; z-index:55"/> <!--onclick="ShowHideWindow('MainToolbar')"--> 
         <div id="MainToolbar" class="CommonBorder BackgroundBorder">
 <!--            <img src="images/i_tools.png" style="height:30px; width:30px; margin:-5px; position:absolute; right:-5px;"/>           --> 
             <ul class="ulMain">
@@ -463,7 +326,7 @@
             </ul>            
         </div>
 
-        <div id="OptionToolba" class="OptionToolbar2 CommonBorder BackgroundBorder">
+        <div id="OptionToolba" class="OptionToolbar CommonBorder BackgroundBorder">
             <p style="margin-top:10px; margin-left:50px; font-size:14px;">Портал Амур</p>
             <img style="position:absolute; top:0px; right:40px;" src="images/i_list.png" alt="Вкл/Выкл панель выбора имеющихся данных" class="ToolbarToggleButton" onclick="ShowHideWindow('AdditionalDiv');"/>
             <div id="lockIcon" style="position:absolute; top:0px; right:5px;" class="ToolbarToggleButton lockImage" onclick="ShowHideWindow('loginWindow');"></div>
@@ -568,17 +431,16 @@
                     <div title="Прогнастические данные" id="icFor" class="MenuButton"></div>            
                     <ul id="TabBorderFor" class="BackgroundBorder">                        
                         <li><div class="arr" id="twPWRF" onclick="TWSelUnSel('twPWRF', 'twWRF')"></div><input type="checkbox" name="visLayers" id="cbGRIB"/>Прогностические данные</li>
-                        <div id="twWRF" class="tree-view">
+                        <div id="twWRF" class="tree-view" style="position:relative;">
                             <ul>
-                                <li>Геопотенциал<br/>
+                                <li><div id="hpselDiv"></div>
                                     <input type="checkbox" name="visLayers" id="cbHGTIsoline"/>Изолинии
                                     <input type="checkbox" name="visLayers" id="cbHGTField"/>Поля
-                                </li>
-                                <li>Температура<br/>
+                                <li><div id="tmpselDiv"></div><!--Температура<br/>-->
                                     <input type="checkbox" name="visLayers" id="cbTMPIsoline"/>Изолинии
                                     <input type="checkbox" name="visLayers" id="cbTMPField"/>Поля
                                 </li>
-                                <li>Влажность<br/>
+                                <li><div id="rhselDiv"></div><!--Влажность<br/>-->
                                     <input type="checkbox" name="visLayers" id="cbRHIsoline"/>Изолинии
                                     <input type="checkbox" name="visLayers" id="cbRHField"/>Поля
                                 </li>
@@ -609,9 +471,9 @@
             <img src="images/i_overview.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
             <div style="text-align:center;"> Обзор карты </div>
             <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('overviewMapWindow');"/>            
-            <div id="overviewMapDiv" style="width:100%; height:90%; "></div>
+            <div id="overviewMapDiv" style="width:100%; height:90%;"></div>
         </div>
-
+        
         <div id="legendWindow" class="moveable BackgroundBorder" dojoType="dojo/dnd/Moveable">
             <img src="images/i_legend.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
             Легенда карты
@@ -683,7 +545,7 @@
                 <span id="progBar" style="width: 0%"></span>
             </div>
             <a href="http://www.dvrcpod.ru/" title="ДЦ ФГБУ &quot;НИЦ &quot;Планета&quot;" target="_blank" style="position:absolute; margin:220px; margin-top:-40px; z-index:60;">www.dvrcpod.ru</a>
-            <a href="http://khabmeteo.ru/" title="ФГБУ &quot;Дальневосточное УГМС&quot;" target="_blank" style="position:absolute; margin:225px; margin-top:-150px; z-index:60; ">khabmeteo.ru</a>
+            <a href="http://khabmeteo.ru/" title="ФГБУ &quot;Дальневосточное УГМС&quot;" target="_blank" style="position:absolute; margin:225px; margin-top:-150px; z-index:60; ">www.khabmeteo.ru</a>
         </div>
 
         <div id="InfoWindow" class="CommonBorder BackgroundBorder">            

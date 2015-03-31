@@ -1,195 +1,13 @@
-﻿dojo.provide('dcrscplaneta.LineEditor');
-dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
-
-dojo.require("esri.tasks.query");
-dojo.require("esri.tasks.query");
-dojo.require("esri.layers.LayerTimeOptions");
-
-function SupaSelectImage(id) {
-    if (mDates.Layers != undefined) {
-var Soop = {
-            'MODIS_Raster': ['cbModis'],
-            'METEOR1_Raster': ['cbMeteor1'],
-            'LANDSAT8_Raster': ['cbLandsat8'],
-            'RESURSP_Raster': ['cbResursp'],
-            'KANOPUS_Raster': ['cbKanopus']
-};
-
-        for (var i = 0; i < mDates.Layers.length; i++)
-        {
-            if (mDates.Layers[i].id == id) {
-                var inSelect = '';
-                if (mDates.Layers[i].datesList.childNodes[0].childNodes.length != 0) {
-                    for (var j = 0; j < mDates.Layers[i].datesList.childNodes[0].childNodes.length; j++) {
-                        var compDate = new Date(mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].value);
-                        if (mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].checked) {
-                            //inSelect += ", date'" + mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[1].innerText + "'";
-                            var mS = new Date(compDate - 1000);
-                            var tmS = mS.getUTCFullYear() + "-" + ("0" + (mS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + mS.getUTCDate()).slice(-2) + " " + ("0" + mS.getUTCHours()).slice(-2) + ":" + ("0" + mS.getUTCMinutes()).slice(-2) + ":" + ("0" + mS.getUTCSeconds()).slice(-2);
-                            var pS = new Date(compDate.getTime() + 1000);
-                            var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
-                            //inSelect += " OR datadatetime between date'" + tmS + "' and date'" + tpS +"'";
-                            inSelect += " OR ((datadatetime > date '" + tmS + "') and datadatetime < (date'" + tpS + "'))"
-                        }
-                    }
-                }
-                inSelect = inSelect.substring(4);
-                if (inSelect == "") {
-                    inSelect = "datadatetime < date'0001-01-01'";
-                    //disable checkbox
-                    for (var j = 0; j < Soop[id].length; j++) { dojo.byId(Soop[id][j]).checked = false; }
-                    map.getLayer(id).hide();
-                } else {
-                    //if checkbox disable enabled
-                    for (var j = 0; j < Soop[id].length; j++) { dojo.byId(Soop[id][j]).checked = true; }
-                    map.getLayer(id).show()
-                }
-                mDates.refreshVisible();
-                map.getLayer(id).setDefinitionExpression(inSelect);
-            }
-        }
-    }
-    mDates.Layers.length
-}
-
-function SupaSelectMap(id) {
-    if (mDates.Layers != undefined) {
-        var Soop = {
-            'Flood': ['cbFloodPolygons'],
-            'SnowMap': ['cbSnowMap'],
-            'SnowBorders': ['cbSnowBorders'],
-            'Ascat': ['cbAscat'],
-            'Hydro': ['cbWaterLevel'],
-            'Snow': ['cbSnowDepth'],
-            'Snow_kn24': ['cbSnowDepth24'],
-            'Meteo': ['cbMeteo', 'cbWindSpeed', 'cbWeatherEvent', 'cbWeatherEventCol', 'cbWeatherTmpIso', 'cbWeatherPresIso'],
-            'GRIB_HGT_ISO': ['cbHGTIsoline'],
-            'GRIB_TMP_ISO': ['cbTMPIsoline'],
-            'GRIB_RH_ISO': ['cbRHIsoline'],
-            'GRIB_PRMSL_ISO': ['cbPRMSLIsoline'],
-        };
-        var TimeSoop = {
-            'Flood': 'datadatetime ',
-            'SnowMap': 'datadatetime ',
-            'SnowBorders': 'datadatetime ',
-            'Ascat': 'datadatetime ',
-            'Hydro': 'datadatetime ',
-            'Snow': 'date ',
-            'Snow_kn24': 'datadatetime',
-            'Meteo': 'date',
-            'GRIB_HGT_ISO': 'date',
-            'GRIB_TMP_ISO': 'date',
-            'GRIB_RH_ISO': 'date',
-            'GRIB_PRMSL_ISO': 'date',
-        };
-        for (var i = 0; i < mDates.Layers.length; i++) {
-            if (mDates.Layers[i].id == id) {
-                var inSelect = '';
-                var tfield = TimeSoop[id];
-                if (mDates.Layers[i].datesList.childNodes[0].childNodes.length != 0) {
-                    for (var j = 0; j < mDates.Layers[i].datesList.childNodes[0].childNodes.length; j++) {
-                        var compDate = new Date(mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].value);
-                        if (mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].checked) {
-                            //inSelect += ", date'" + mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[1].innerText + "'";
-                            var mS = new Date(compDate - 1000);
-                            var tmS = mS.getUTCFullYear() + "-" + ("0" + (mS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + mS.getUTCDate()).slice(-2) + " " + ("0" + mS.getUTCHours()).slice(-2) + ":" + ("0" + mS.getUTCMinutes()).slice(-2) + ":" + ("0" + mS.getUTCSeconds()).slice(-2);
-                            var pS = new Date(compDate.getTime() + 1000);
-                            var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
-                            inSelect += " OR " + tfield + " between date'" + tmS + "' and date'" + tpS + "'";
-                        }
-                    }
-                }
-                inSelect = inSelect.substring(4);
-                if (inSelect == "") {
-                    //inSelect = "datadatetime < date'0001-01-01'";
-                    //disable checkbox
-                    for (var j = 0; j < Soop[id].length; j++) {
-                        dojo.byId(Soop[id][j]).checked = false;
-                    }
-                    map.getLayer(id).hide();
-                } else {
-                    //if checkbox disable enabled
-                    for (var j = 0; j < Soop[id].length; j++) {
-                        dojo.byId(Soop[id][j]).checked = true;
-                    }
-                    map.getLayer(id).show()
-                }
-                mDates.refreshVisible();
-
-                var Shmar = map.getLayer(id).visibleLayers;
-                var layerDef = [];
-                var uh = map.getLayer(id).timeInfo;
-                var TimeOptions = [];
-                var tOpt = new esri.layers.LayerTimeOptions();                
-                tOpt.useTime = false;
-                for (var j = 0; j < Shmar.length; j++) {
-                    layerDef[Shmar[j]] = inSelect;
-                    TimeOptions[Shmar[j]] = tOpt;
-                }
-                map.getLayer(id).setLayerTimeOptions(TimeOptions, true);
-                map.getLayer(id).setLayerDefinitions(layerDef);
-            }
-        }
-    }
-    mDates.Layers.length
-}
-
-
+﻿
 function initDatesSelector() {
-
-    var Soop = {        
-            'MODIS_Raster': ['cbModis'],
-            'METEOR1_Raster': ['cbMeteor1'],
-            'LANDSAT8_Raster': ['cbLandsat8'],
-            'RESURSP_Raster': ['cbResursp'],
-            'KANOPUS_Raster': ['cbKanopus'],
-            'Flood': ['cbFloodPolygons'],
-            'SnowMap': ['cbSnowMap'],
-            'SnowBorders': ['cbSnowBorders'],
-            'Ascat': ['cbAscat'],
-            'Hydro': ['cbWaterLevel'],
-            'Snow': ['cbSnowDepth'],
-            'Snow_kn24': ['cbSnowDepth24'],
-            'Meteo': ['cbMeteo', 'cbWindSpeed', 'cbWeatherEvent', 'cbWeatherEventCol', 'cbWeatherTmpIso', 'cbWeatherPresIso'],
-            'GRIB_HGT_ISO': ['cbHGTIsoline'],
-            'GRIB_TMP_ISO': ['cbTMPIsoline'],
-            'GRIB_RH_ISO': ['cbRHIsoline'],
-            'GRIB_PRMSL_ISO': ['cbPRMSLIsoline']
-    };
-    var TimeSoop = {
-        'MODIS_Raster': 'DataDateTime ',
-        'METEOR1_Raster': 'DataDateTime ',
-        'LANDSAT8_Raster': 'DataDateTime ',
-        'RESURSP_Raster': 'DataDateTime ',
-        'KANOPUS_Raster': 'DataDateTime ',
-        'Flood': 'datadatetime ',
-        'SnowMap': 'datadatetime ',
-        'SnowBorders': 'datadatetime ',
-        'Ascat': 'datadatetime ',
-        'Hydro': 'datadatetime ',
-        'Snow': 'date ',
-        'Snow_kn24': 'datadatetime',
-        'Meteo': 'date',
-        'GRIB_HGT_ISO': 'date',
-        'GRIB_TMP_ISO': 'date',
-        'GRIB_RH_ISO': 'date',
-        'GRIB_PRMSL_ISO': 'date',
-    };
 
     function dcrscplaneta_GetDates( dList, featureSet) {
         var dates = [];
-        var tField = TimeSoop[dList.id];
+        var tField = lDConfig[dList.id].dField;//TimeSoop[dList.id];
         for (var i = 0; i < featureSet.features.length; i++) {
             var dat = JSON.stringify(featureSet.features[i].attributes);//.toString();//.$tField;// .attributes[tField];
             var dtime = dat.split(/[:{}]/);
             dates.push(new Date(+dtime[2]));
-            //var dat = featureSet.features[i].attributes.toSource();
-            //if (featureSet.features[i].attributes.datadatetime == undefined) {
-            //    dates.push(new Date(featureSet.features[i].attributes.DataDateTime));
-            //} else {
-            //    dates.push(new Date(featureSet.features[i].attributes.datadatetime));
-            //}
         }
         //clear old
         while (dList.Value.firstChild) {
@@ -206,8 +24,9 @@ function initDatesSelector() {
                 var listItem = document.createElement("li");
                 var checkbox = document.createElement('input');
                 checkbox.type = "checkbox";
-                var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
-                if (Image.indexOf(dList.id) > -1) {
+                //var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
+                var a = map.getLayer(dList.id).__proto__.declaredClass;
+                if ((a === "esri.layers.ArcGISImageServiceLayer") || (a === "dcrscplaneta.clsChangeItemDMSLField")) {
                     checkbox.onchange = function mfk(evt) { SupaSelectImage(dList.id) };
                 } else {
                     checkbox.onchange = function mfk(evt) { SupaSelectMap(dList.id) };
@@ -248,11 +67,11 @@ function initDatesSelector() {
                     if (inSelect == "") {
                         inSelect = "datadatetime < date'0001-01-01'";
                         //disable checkbox
-                        for (var j = 0; j < Soop[id].length; j++) { dojo.byId(Soop[id][j]).checked = false; }
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = false; }
                         map.getLayer(id).hide();
                     } else {
                         //if checkbox disable enabled
-                        for (var j = 0; j < Soop[id].length; j++) { dojo.byId(Soop[id][j]).checked = true; }
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = true; }
                         map.getLayer(id).show()
                     }
                     mDates.refreshVisible();
@@ -268,7 +87,7 @@ function initDatesSelector() {
             for (var i = 0; i < mDates.Layers.length; i++) {
                 if (mDates.Layers[i].id == id) {
                     var inSelect = '';
-                    var tfield = TimeSoop[id];
+                    var tfield = lDConfig[id].dField;//TimeSoop[id];
                     if (mDates.Layers[i].datesList.childNodes[0].childNodes.length != 0) {
                         for (var j = 0; j < mDates.Layers[i].datesList.childNodes[0].childNodes.length; j++) {
                             var compDate = new Date(mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].value);
@@ -286,14 +105,14 @@ function initDatesSelector() {
                     if (inSelect == "") {
                         //inSelect = "datadatetime < date'0001-01-01'";
                         //disable checkbox
-                        for (var j = 0; j < Soop[id].length; j++) {
-                            dojo.byId(Soop[id][j]).checked = false;
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) {
+                            dojo.byId(lDConfig[id].chBoxes[j]).checked = false;
                         }
                         map.getLayer(id).hide();
                     } else {
                         //if checkbox disable enabled
-                        for (var j = 0; j < Soop[id].length; j++) {
-                            dojo.byId(Soop[id][j]).checked = true;
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) {
+                            dojo.byId(lDConfig[id].chBoxes[j]).checked = true;
                         }
                         map.getLayer(id).show()
                     }
@@ -310,19 +129,27 @@ function initDatesSelector() {
                         TimeOptions[Shmar[j]] = tOpt;
                     }
                     map.getLayer(id).setLayerTimeOptions(TimeOptions, true);
+                    if (map.getLayer(id).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSL") {
+                        map.getLayer(id).setDate(inSelect);
+                    } else {
                     map.getLayer(id).setLayerDefinitions(layerDef);
+                }
+            }
+        }
         }
     }
-        }
-        mDates.Layers.length
-    }
-
 
     dojo.declare(
         'dcrscplaneta.DatesSelector',
         [dijit._Widget, dijit._Templated],
         {
-            templatePath: new dojo._Url('', 'scripts/DatesSelector.html'),
+            templateString: '<div class="DatesSelector" style="color:gray">' +
+                                '<div>' + 
+                                    '<span class="arr" data-dojo-attach-point="arLeft" data-dojo-attach-event="onclick:ShowHideTreeView"></span>' +
+                                    '<span data-dojo-attach-point="titleNode"></span>' +
+                                '</div>' +
+                                '<div class="tree-view" data-dojo-attach-point="datesList"></div>' +
+                            '</div>',
             url: '',
             id: '',
             'ShowHideTreeView': function () {
@@ -335,7 +162,7 @@ function initDatesSelector() {
                 }
             },
             'Reload': function (ds, de) {
-                var tfield = TimeSoop[this.id];
+                var tfield = lDConfig[this.id].dField;//TimeSoop[this.id];
                 var queryTask = new esri.tasks.QueryTask(this.url);
                 var query = new esri.tasks.Query();
                 query.returnGeometry = false;
@@ -384,11 +211,18 @@ function initDatesSelector() {
                     }
                 }                
             },
-            'SetTime': function () {
-                var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
-                if (Image.indexOf(this.id) > -1) {
+            'SetTime': function (ds, de) {
+                var a = map.getLayer(this.id).__proto__.declaredClass;
+                //var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
+                if ( map.getLayer(this.id).__proto__.declaredClass === "esri.layers.ArcGISImageServiceLayer") {//Image.indexOf(this.id) > -1) {
+                    map.getLayer(this.id).setDefinitionExpression("DataDateTime between date '" + ds + "' and date '" + de + "'");
                     return;
                 }
+                if (map.getLayer(this.id).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSLField") {//Image.indexOf(this.id) > -1) {
+                    map.getLayer(this.id).setDefinitionExpression("datadatetime between date '" + ds + "' and date '" + de + "'");
+                    return;
+                }
+                if (map.getLayer(this.id).__proto__.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer") {
                 var Shmar = map.getLayer(this.id).visibleLayers;
                 var layerDef = [];
                 var uh = map.getLayer(this.id).timeInfo;
@@ -400,18 +234,35 @@ function initDatesSelector() {
                 }
                 map.getLayer(this.id).setLayerTimeOptions(TimeOptions, true);
                 map.getLayer(this.id).setLayerDefinitions(layerDef);
+                    return;
+                }
+                if (map.getLayer(this.id).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSL") {
+                    map.getLayer(this.id).resDate();
+                    var TimeOptions = [];
+                    var Shmar = map.getLayer(this.id).visibleLayers;
+                    var tOpt = new esri.layers.LayerTimeOptions();
+                    tOpt.useTime = true;
+                    for (var j = 0; j < Shmar.length; j++) {
+                        TimeOptions[Shmar[j]] = tOpt;
+                    }
+                    map.getLayer(this.id).setLayerTimeOptions(TimeOptions, true);
+                    return;
             }
+                var k = 9;
+        }
         }
     );
     dojo.declare(
         'dcrscplaneta.DatesList',
         [dijit._Widget, dijit._Templated],
         {
-            templatePath: new dojo._Url('', 'scripts/DatesList.html'),
+            templateString : '<div class="DatesList" data-dojo-attach-point="container"></div>',
             Layers : undefined,
             'Refresh': function (ds, de) {
+                var dde = de.getUTCFullYear() + "-" + ("0" + (de.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + de.getUTCDate()).slice(-2) + " " + ("0" + de.getUTCHours()).slice(-2) + ":00:00";
+                var dds = ds.getUTCFullYear() + "-" + ("0" + (ds.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ds.getUTCDate()).slice(-2) + " " + ("0" + ds.getUTCHours()).slice(-2) + ":00:00";
                 for (var i = 0; i < this.Layers.length; i++) {
-                    this.Layers[i].Reload(ds, de);
+                    this.Layers[i].Reload(dds, dde);
                 }
             },
             'Reload': function (map, token, ds, de) {
@@ -420,45 +271,26 @@ function initDatesSelector() {
                 while (this.container.firstChild) {
                     this.container.removeChild(this.container.firstChild);
                 }
-                
                 //Run getDates
-                var nLayers = {
-                    'Flood': "Разливы",
-                    'SnowMap': "Карты снежного покрова",
-                    'SnowBorders': "Границы снежного покрова",
-                    'Ascat': "Влажность почвы",
-                    'Hydro': "Уровни воды",
-                    'Snow': "Высота снега (КН-01)",
-                    'Snow_kn24': "Высота снега (КН-24)",
-                    'Meteo': "Метеорологическая информация",
-                    'GRIB_HGT_ISO': "Геопотенциал (изолинии)",
-                    'GRIB_TMP_ISO': "Температура (изолинии)",
-                    'GRIB_RH_ISO': "Влажность (изолинии)",
-                    'GRIB_PRMSL_ISO': "Давление (изолинии)",
-                    'MODIS_Raster': "TERRA/AQUA (MODIS)",
-                    'METEOR1_Raster': "Метеор-М №1 (КМСС)",
-                    'LANDSAT8_Raster': "Landsat 8 (OLI)",
-                    'RESURSP_Raster': "Ресурс-П №1 (ШМСА)",
-                    'KANOPUS_Raster': "Канопус-В (МСС)"
-                };
+                var dde = de.getUTCFullYear() + "-" + ("0" + (de.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + de.getUTCDate()).slice(-2) + " " + ("0" + de.getUTCHours()).slice(-2) + ":00:00";
+                var dds = ds.getUTCFullYear() + "-" + ("0" + (ds.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + ds.getUTCDate()).slice(-2) + " " + ("0" + ds.getUTCHours()).slice(-2) + ":00:00";
                 for (var i = 0; i < map.layerIds.length; i++) {
-                    if (nLayers.hasOwnProperty(map.layerIds[i])) {
-
+                    if (lDConfig[map.layerIds[i]].dField != "") {
                         var tVar = new dcrscplaneta.DatesSelector();
-                        tVar.titleNode.innerText = nLayers[map.layerIds[i]];
+                        tVar.titleNode.innerText = lDConfig[map.layerIds[i]].visName;
                         tVar.url = map.getLayer(map.layerIds[i]).url;
                         tVar.id = map.layerIds[i];
                         if (tVar.url.indexOf("/ImageServer") < 0) {
                             if (tVar.url.indexOf("/?token=") > -1) { tVar.url = tVar.url.substr(0, tVar.url.indexOf("/?token=")) + "/0?token=" + token; } else { tVar.url = tVar.url + "/1"; }
                         }
-                        tVar.Reload(ds, de);
+                        tVar.Reload(dds, dde);
                         this.Layers.push(tVar);
                         this.container.appendChild(tVar.domNode);
                     }
                 }
             },
             'Select': function (ds, de) {
-                if (this.Layers != undefined) {
+                if (this.Layers != undefined) {                    
                     
                   //  var dateS = new Date(Date.UTC(ds.substring(0, 4), ds.substring(5, 7) - 1, ds.substring(8, 10), ds.substring(11, 13), 0, 0));// Date(ds);
                   //  var dsd = dateS.getUTCFullYear() + "-" + dateS.getUTCMonth() + "-" + dateS.getUTCDate() + " " + dateS.getUTCHours();
@@ -473,10 +305,10 @@ function initDatesSelector() {
                     this.refreshVisible();
                 }
             },
-            'SetTime': function () {
+            'SetTime': function (ds, de) {
                 if (this.Layers != undefined) {
                     for (var i = 0; i < this.Layers.length; i++) {
-                        this.Layers[i].SetTime();
+                        this.Layers[i].SetTime(ds, de);
                     }
                     this.refreshVisible();
                 }

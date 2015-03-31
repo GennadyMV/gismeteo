@@ -1,32 +1,6 @@
 ﻿// Checkbox SubLayers
 require(["dojo/dom", "dojo/on", "dojo/domReady!"],
-function (dom, on) {    
-    
-    function WRFUpdateLayerVisibility() {
-        if (dojo.byId('cbGRIB').checked) {
-            if (dojo.byId('cbHGTIsoline').checked) map.getLayer("GRIB_HGT_ISO").show(); else map.getLayer("GRIB_HGT_ISO").hide();
-            if (dojo.byId('cbTMPIsoline').checked) map.getLayer("GRIB_TMP_ISO").show(); else map.getLayer("GRIB_TMP_ISO").hide();
-            if (dojo.byId('cbRHIsoline').checked) map.getLayer("GRIB_RH_ISO").show(); else map.getLayer("GRIB_RH_ISO").hide();
-            if (dojo.byId('cbPRSMLIsoline').checked) map.getLayer("GRIB_PRMSL_ISO").show(); else map.getLayer("GRIB_PRMSL_ISO").hide();
-            if (dojo.byId('cbHGTField').checked) map.getLayer("GRIB_HGT_FIELD").show(); else map.getLayer("GRIB_HGT_FIELD").hide();
-            if (dojo.byId('cbTMPField').checked) map.getLayer("GRIB_TMP_FIELD").show(); else map.getLayer("GRIB_TMP_FIELD").hide();
-            if (dojo.byId('cbRHField').checked) map.getLayer("GRIB_RH_FIELD").show(); else map.getLayer("GRIB_RH_FIELD").hide();
-            if (dojo.byId('cbPRSMLField').checked) map.getLayer("GRIB_PRMSL_FIELD").show(); else map.getLayer("GRIB_PRMSL_FIELD").hide();
-            if (dojo.byId('cbGRIBWind').checked) map.getLayer("GRIB_WIND").show(); else map.getLayer("GRIB_WIND").hide();
-        } else {
-            map.getLayer("GRIB_HGT_ISO").hide();
-            map.getLayer("GRIB_TMP_ISO").hide();
-            map.getLayer("GRIB_RH_ISO").hide();
-            map.getLayer("GRIB_PRMSL_ISO").hide();
-            map.getLayer("GRIB_HGT_FIELD").hide();
-            map.getLayer("GRIB_TMP_FIELD").hide();
-            map.getLayer("GRIB_RH_FIELD").hide();
-            map.getLayer("GRIB_PRMSL_FIELD").hide();
-            map.getLayer("GRIB_WIND").hide();
-        }
-        RefreshLegend(map, "legendDiv");
-    }
-
+function (dom, on) {
     //FORECAST Borsch
     on(dom.byId("cbZeyaForecast"), "change", ZeyaUpdateLayerVisibility);
     on(dom.byId("cbZeyaCOSMO"), "change", ZeyaUpdateLayerVisibility);
@@ -239,7 +213,10 @@ function (dom, on) {
                 if (dojo.byId('cbAscat').checked) map.getLayer("Ascat").show(); else map.getLayer("Ascat").hide();
                 break;
             case "cbHGTIsoline":
-                if (dojo.byId('cbHGTIsoline').checked) map.getLayer("GRIB_HGT_ISO").show(); else map.getLayer("GRIB_HGT_ISO").hide();
+                if (dojo.byId('cbHGTIsoline').checked)  map.getLayer("GRIB_HGT_ISO").show(); else map.getLayer("GRIB_HGT_ISO").hide();
+                break;
+            case "cbHGTField":
+                if (dojo.byId('cbHGTField').checked) map.getLayer("GRIB_HGT_FIELD").show(); else map.getLayer("GRIB_HGT_FIELD").hide();
                 break;
             case "cbRHIsoline":
                 if (dojo.byId('cbRHIsoline').checked) map.getLayer("GRIB_RH_ISO").show(); else map.getLayer("GRIB_RH_ISO").hide();

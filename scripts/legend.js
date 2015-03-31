@@ -372,6 +372,7 @@ require([
         }
     });
     declare("dcrscplaneta.Legend", [dijit._Widget, dijit._Templated], {
+        /*
         jName: {
             'Bounds': "Границы",
             'Restrict': "Охраняемые природные территории",
@@ -409,6 +410,7 @@ require([
             'KANOPUS_Raster': "R(? мкм)<br>G(? мкм)<br>B(? мкм))",
             'MTSat_Cloud'   : "ИК канал 10.3-11.3 мкм"
         },
+        */
         templateString: "<div><div>",
         legSettings: [],
         elements: [],
@@ -418,30 +420,31 @@ require([
             // Read map Layers
             for (var i = 0; i < map.layerIds.length; i++) {
                 // Слои для которых легенду получаем с сервера                
-                if (this.jName.hasOwnProperty(map.layerIds[i])) {
-                    var visId = map.getLayer(map.layerIds[i]).visibleLayers;
-                    var tid = map.layerIds[i];
-                    var str = map.getLayer(map.layerIds[i]).url;                    
-                    if (str.indexOf("/?token=") > -1) {
-                        str = str.substr(0, str.indexOf("/?token=")) + "/legend?f=pjson&token=" + token;
-                    } else {
-                        str = str + "/legend?f=pjson";
-                    }
-                    var result = getJSON(str , i);
-                    var obj = JSON.parse(result);
-                    var title = this.jName[tid];
-                    var ik = this.elements.length;
+                if ((map.layerIds[i] != "layer0")) {
+                    if ((lDConfig[map.layerIds[i]].fLegend === "") && (lDConfig[map.layerIds[i]].visName != "")) {//this.jName.hasOwnProperty(map.layerIds[i])) {
+                        var visId = map.getLayer(map.layerIds[i]).visibleLayers;
+                        var tid = map.layerIds[i];
+                        var str = map.getLayer(map.layerIds[i]).url;
+                        if (str.indexOf("/?token=") > -1) {
+                            str = str.substr(0, str.indexOf("/?token=")) + "/legend?f=pjson&token=" + token;
+                        } else {
+                            str = str + "/legend?f=pjson";
+                        }
+                        var result = getJSON(str, i);
+                        var obj = JSON.parse(result);
+                        var title = lDConfig[map.layerIds[i]].visName;//this.jName[tid];
+                        var ik = this.elements.length;
 
-                    this.elements[ik] = new dcrscplaneta.elLegend();
-                    if (this.elLayers.indexOf(map.layerIds[i]) > -1) {
-                        this.elements[ik].AddSettings(map.getLayer(map.layerIds[i]));
+                        this.elements[ik] = new dcrscplaneta.elLegend();
+                        if (map.getLayer(map.layerIds[i]).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSL") {//this.elLayers.indexOf(map.layerIds[i]) > -1) {
+                            this.elements[ik].AddSettings(map.getLayer(map.layerIds[i]));
+                        }
+                        this.elements[ik].CreateElement(title, map.layerIds[i], obj);
+                        this.domNode.appendChild(this.elements[ik].domNode);
+                    } else {
+                        // Слои для которых легенда статична
+                        //if (this.rName.hasOwnProperty(map.layerIds[i])) {
                     }
-                    this.elements[ik].CreateElement(title, map.layerIds[i], obj);
-                    this.domNode.appendChild(this.elements[ik].domNode);
-                }
-                // Слои для которых легенда статична
-                if (this.rName.hasOwnProperty(map.layerIds[i])) {
-                    
                 }
             }
         },
@@ -449,136 +452,3 @@ require([
         }
     });
 });
-
-/*
-dojo.declare(
-    'dcrscplaneta.LineEditor',
-    [dijit._Widget, dijit._Templated],
-    {
-        templateString: "<div><div>",
-        legSettings: [],
-        elements: [],
-        'buildLegend': function (map) { //This Function Create All elements of legend
-            //Clear
-            this.legSettings = [];
-            this.elements = [];
-            //Get map params
-            var curZoom = map.getZoom();
-            
-            var jName = [];
-            var rName = []; var rLabel = [];
-            jName['Bounds'] = "Границы";
-            jName['Restrict'] = "Охраняемые природные территории";
-            jName['City'] = "Города";
-            jName['Rivers'] = "Гидро объекты";
-            jName['Roads'] = "Авто- и ЖД- дороги";
-            jName['Shoreline'] = "Береговая линия";
-
-            rName['MODIS_Raster'] = "TERRA/AQUA (MODIS)";   rLabel['MODIS_Raster'] =    "R(0.776-0.841 мкм)<br>G(0.776-0.841 мкм)<br> B(0.620-0.670 мкм))";
-            rName['METEOR1_Raster'] = "Метеор-М №1 (КМСС)"; rLabel['METEOR1_Raster'] =  "R(0.760-0.900 мкм)<br>G(0.580-0.690 мкм)<br>B(0.450-0.510 мкм))";
-            rName['LANDSAT8_Raster'] = "Landsat 8 (OLI)";   rLabel['LANDSAT8_Raster'] = "R(2.100-2.300 мкм)<br>G(0.850-0.890 мкм)<br>B(0.530-0.600 мкм))";
-            rName['RESURSP_Raster'] = "Ресурс-П №1 (ШМСА)"; rLabel['RESURSP_Raster'] =  "R(? мкм)<br>G(? мкм)<br>B(? мкм))";
-            rName['KANOPUS_Raster'] = "Канопус-В (МСС)";    rLabel['KANOPUS_Raster'] =  "R(? мкм)<br>G(? мкм)<br>B(? мкм))";
-
-            jName['Flood'] = "Разливы";
-            jName['SnowMap'] = "Карты снежного покрова";
-            jName['SnowBorders'] = "Границы снежного покрова";
-            rName['MTSat_Cloud'] = "Карта облачности (MTSAT)"; rLabel['MTSat_Cloud'] = "ИК канал 10.3-11.3 мкм";
-            jName['Ascat'] = "Влажность почвы";
-
-            jName['Hydro'] = "Уровни воды";
-            jName['Snow'] = "Высота снега (КН-01)";
-            jName['Snow_kn24'] = "Высота снега (КН-24)";
-            jName['Meteo'] = "Метеорологическая информация";
-
-            var container = dojo.byId(divname);
-            container.className = "legend";
-            while (container.firstChild) container.removeChild(container.firstChild); // clear container
-
-            var mainUl = document.createElement("div")//("ul");
-            container.appendChild(mainUl);
-
-            for (var i = 0; i < map.layerIds.length; i++) {        
-                // Слои для которых легенду получаем с сервера
-                // check Layer is Visible
-                if (!map.getLayer(map.layerIds[i]).visible) continue;
-
-                if (jName.hasOwnProperty(map.layerIds[i])) {
-                    var visId = map.getLayer(map.layerIds[i]).visibleLayers;
-
-                    var tid = map.layerIds[i] + "_legend"
-                    var result = getJSON(map.getLayer(map.layerIds[i]).url + "/legend?f=pjson", i);
-                    var obj = JSON.parse(result);
-
-                    var layerList = document.createElement("div")//("li");
-                    mainUl.appendChild(layerList);
-                    layerList.innerHTML = "<div class=\"arr\" id=\"" + tid + "\" onclick=\"TWSelUnSel('" + tid + "', '" + tid + "_ch" + "')\"></div>" +
-                                          //"<div class=\"legend_element_set\"><img src=\"images/addicon/arrow-up.png\"/><img src=\"images/addicon/arrow-down.png\"/><img src=\"images/addicon/settings.png\"/></div>" +
-                                          "<div class=\"legend_element_set\"><span class=\"arrdown\"></span><span class=\"arrup\"></span><span class=\"settings\" onclick=\"showHide('" + tid + "_set', true);\"></span></div>" +
-                                            jName[map.layerIds[i]];
-
-                    var platformDiv = document.createElement("div");
-                    platformDiv.className = "clsPlatform";
-                    //platformDiv.innerHTML = "<div dojoType=\"dcrscplaneta.LineEditor\" data-dojo-props=\"open:false\" id=\"" + tid + "_set\"></div>"
-                    mainUl.appendChild(platformDiv);
-
-                    var layerListDiv = document.createElement("div");
-                    layerListDiv.id = tid + "_ch";
-                    layerListDiv.className = "tree-view";
-                    mainUl.appendChild(layerListDiv);
-
-                    var layerListUl = document.createElement("ul");
-                    layerListDiv.appendChild(layerListUl);
-
-                    for (var j = 0; j < obj.layers.length; j++) {
-                        if (visId.indexOf(obj.layers[j].layerId) < 0) continue;
-
-                        if (obj.layers[j].legend.length == 1 && obj.layers[j].legend[0].label == "") {
-                            var legendList = document.createElement("li");
-                            //<img src="data:image/png;base64,BASE64_ENCODED_DATA_HERE">
-                            legendList.innerHTML = "<img class=\"legimg\" src=\"data:" + obj.layers[j].legend[0].contentType + ";base64," + obj.layers[j].legend[0].imageData + "\">" + obj.layers[j].layerName;
-                            layerListUl.appendChild(legendList);
-                            continue;
-                        } else {
-                            var legendList = document.createElement("li");
-                            layerListUl.appendChild(legendList);
-                            legendList.innerHTML = obj.layers[j].layerName;
-                            var legendListUL = document.createElement("ul");
-                            legendList.appendChild(legendListUL);
-                            for (var k = 0; k < obj.layers[j].legend.length; k++) {
-                                var subLegendList = document.createElement("li");
-                                //<img src="data:image/png;base64,BASE64_ENCODED_DATA_HERE">
-                                subLegendList.innerHTML = "<img class=\"legimg\" src=\"data:" + obj.layers[j].legend[k].contentType + ";base64," + obj.layers[j].legend[k].imageData + "\">" + obj.layers[j].legend[k].label;
-                                legendListUL.appendChild(subLegendList);
-                            }
-                        }
-                    }            
-                    var SettingsDiv = new dcrscplaneta.LineEditor();
-                    SettingsDiv.sendOk = alarmMa;
-                    platformDiv.appendChild(SettingsDiv.domNode);
-                    legSettings[tid + '_set'] = SettingsDiv;
-                }
-                // Слои для которых легенда статична
-                if (rName.hasOwnProperty(map.layerIds[i])) {
-                    var tid = map.layerIds[i] + "_legend"
-                    var layerList = document.createElement("li");
-                    mainUl.appendChild(layerList);
-                    layerList.innerHTML = "<div class=\"arr\" id=\"" + tid + "\" onclick=\"TWSelUnSel('" + tid + "', '" + tid + "_ch" + "')\"></div>" +
-                        "<div class=\"legend_element_set\"><img src=\"images/addicon/arrow-up.png\"/><img src=\"images/addicon/arrow-down.png\"/><img src=\"images/addicon/settings.png\"/></div>" + rName[map.layerIds[i]];
-                    var layerListUl = document.createElement("div");
-                    layerListUl.id = tid + "_ch";
-                    layerListUl.className = "tree-view";
-                    layerListUl.innerHTML = rLabel[map.layerIds[i]];
-                    mainUl.appendChild(layerListUl);
-                }
-
-        },
-        'updateVisible': function () {
-
-        },
-        'changeOrder': function () {
-
-        }
-    }
-);
-*/
