@@ -6,7 +6,7 @@
 }
 
 body {
-    background-color: #FFF;                 
+    background-color: #FFF;
     overflow: hidden;
     font-family: "Trebuchet MS";
 }
@@ -30,7 +30,7 @@ body {
     height: 32px;
     top: 5px;
     right: 18px;
-    z-index: 60;
+    z-index: 50;
 }
 
 #MainToolbar:hover {    
@@ -41,7 +41,7 @@ body {
     height: 32px;
     top: 5px;
     right: 18px;
-    z-index: 120;
+    z-index: 50;
 }
 
 .OptionToolbar2 {
@@ -51,7 +51,7 @@ body {
     height: 32px;
     top: 5px;
     left: 18px;
-    z-index: 70;
+    z-index: 60;
 }
 
 .OptionToolbar {
@@ -73,9 +73,8 @@ body {
     height: 32px;
     top: 5px;
     left: 18px;
-    z-index: 120;
+    z-index: 60;
 }
-
 
 #SelProdToolbar {
     transition:0.5s;
@@ -88,7 +87,7 @@ body {
     left: 0;
     margin-left:auto;
     margin-right:auto;
-    z-index: 60;
+    z-index: 50;
 }
 
 #SelProdToolbar:hover {   
@@ -102,7 +101,7 @@ body {
     left: 0;
     margin-left:auto;
     margin-right:auto;
-    z-index: 120;
+    z-index: 50;
 }
 
 #basemapGalleryWindow {
@@ -220,7 +219,7 @@ body {
     padding: 2px;  
     text-align:center;
 }
-
+        
 .moveable_omap{
     position: absolute;                        
     cursor: pointer;
@@ -314,10 +313,10 @@ ul.ulMain li:hover ul li{
 }
 
 #icSat {    
-    background: url(../images/icons/Fut_Sat_s.png) no-repeat center;   
+    background: url(../images/icons/Fut_Sat_s.png) no-repeat center;    
 }
 
-ul li:hover div#icSat { 
+ul li:hover div#icSat {    
     background: url(../images/icons/Fut_Sat_s_c.png) no-repeat center;
 }
 
@@ -359,12 +358,12 @@ ul#TabBorderSat, ul#TabBorderHyd, ul#TabBorderMet, ul#TabBorderFor {
     overflow-y:auto;
 }
 
-ul#TabBorderSat:after, ul#TabBorderHyd:after, ul#TabBorderMet:after, ul#TabBorderFor:after {
-    display:block;
-    clear: both;
-    content: " ";
-    height: 15px;  
-}
+    ul#TabBorderSat:after, ul#TabBorderHyd:after, ul#TabBorderMet:after, ul#TabBorderFor:after {
+        display:block;
+        clear: both;
+        content: " ";
+        height: 15px;  
+    }
 
 
 ul#TabBorderSat li, ul#TabBorderHyd li, ul#TabBorderMet li, ul#TabBorderFor li {

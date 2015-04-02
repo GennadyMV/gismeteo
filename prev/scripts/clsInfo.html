@@ -1,0 +1,20 @@
+﻿<div class="stationInfo" >
+    <div data-dojo-attach-point="dInfo">
+        <div data-dojo-attach-point="stInfo">
+            Станция: <span data-dojo-attach-point="stName"></span><br>
+            Индекс: <span data-dojo-attach-point="stIndex"></span><br>
+        </div>
+        <div data-dojo-attach-point="stArea">
+            Местоположение: <span data-dojo-attach-point="stPosArea"></span>
+        </div>
+    </div>
+    <div data-dojo-attach-point="dGraph" dojoAttachEvent="onMouseOver:mouseOver, onMouseLeave:mouseOut, onMouseMove:mouseMove"  
+        style="position:relative; width:200px; height:200px; background-color:white;">        
+        <div data-dojo-attach-point="dGraphs" style="position:absolute; top:0px; left:0px; height:400px; background-color:white; overflow-y:auto;">
+            
+        </div>        
+        <div data-dojo-attach-point="dDatesT" style="position:absolute; top:0px; left:0px; height:400px; background-color:white;"></div>
+        <div data-dojo-attach-point="dDatesB" style="position:absolute; bottom:0px; left:0px; height:400px; background-color:white;"></div>
+        <div style="position:absolute; width:1px; height:200px; top:0px; left:0px; background-color:orange; display:none" data-dojo-attach-point="dLine"></div>
+    </div>    
+</div>
