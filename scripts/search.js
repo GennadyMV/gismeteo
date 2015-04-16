@@ -16,7 +16,7 @@ function zoom2Search(index) {
     var geom = fSetSearch[index].geometry;
     if (geom !== undefined) {
         map.centerAndZoom(geom, 12);
-        var symbol = new esri.symbols.PictureMarkerSymbol("images/esri_icon.png", 23, 34);
+        var symbol = new esri.symbols.PictureMarkerSymbol("images/find_icon.PNG", 40, 80);
         var graphic = new esri.graphic(geom, symbol);
         map.graphics.add(graphic);
         window.setTimeout(function () { map.graphics.clear() }, 10000);

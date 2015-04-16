@@ -153,6 +153,7 @@ div.legend ul div.tree-view ul, div.legend ul div.selected ul {
     margin:0px;
     width:1px;
     height:1px;
+    z-index:60;
 }
 
 .lineEditior {
@@ -179,7 +180,7 @@ div.legend ul div.tree-view ul, div.legend ul div.selected ul {
     padding:2px; 
     background-color:white;
     width: 130px;
-    height: 60px;
+    height: 80px;
     z-index:99;
 }
 
@@ -212,4 +213,36 @@ div.legend ul div.tree-view ul, div.legend ul div.selected ul {
     background-repeat: no-repeat;
     background-position: left center;
     vertical-align:middle;
+}
+
+div.FieldEditior {
+    display:none;
+    position:absolute;
+    left: 5px;
+    font-family:Georgia;
+    padding: 10px 5px 5px 5px;
+    border-radius: 5px;
+    border: solid 1px black;
+    width: 230px;
+    height: 120px;
+    background-color: white;
+    vertical-align: middle;
+}
+div.showHide {
+    display:none;
+}
+div.showHide:hover {
+    display:block;
+}
+div.fieldSelectOptions {
+    position:absolute;
+    top:70px;
+    left:0;
+    width:200px;
+    border:1px solid #ccc;
+    border-bottom-right-radius:5px;
+    border-bottom-left-radius:5px;
+    overflow:hidden;
+    background:#f6f6f6;
+    padding-top:2px;
 }

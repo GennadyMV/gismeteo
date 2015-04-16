@@ -1,0 +1,64 @@
+
+ 
+04-14-15 23:40:17 | GET detected
+04-14-15 23:40:17 | Proxy could not resolve requested url - http://services.arcgisonline.com/ArcGIS/rest/services/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+04-14-15 23:40:59 | GET detected
+04-14-15 23:40:59 | could not find driver
+04-14-15 23:40:59 | Ok to proxy
+04-14-15 23:40:59 | Proxy complete
+ 
+04-14-15 23:48:31 | GET detected
+04-14-15 23:48:31 | could not find driver
+04-14-15 23:48:31 | Ok to proxy
+04-14-15 23:48:31 | Proxy complete
+ 
+04-14-15 23:48:59 | GET detected
+04-14-15 23:48:59 | could not find driver
+04-14-15 23:48:59 | Ok to proxy
+04-14-15 23:48:59 | Proxy complete
+ 
+04-14-15 23:49:23 | GET detected
+04-14-15 23:49:23 | could not find driver
+04-14-15 23:49:23 | Ok to proxy
+04-14-15 23:49:23 | Proxy complete
+ 
+04-14-15 23:58:10 | GET detected
+04-14-15 23:58:10 | could not find driver
+04-14-15 23:58:10 | Ok to proxy
+04-14-15 23:58:10 | Proxy complete
+ 
+04-15-15 00:19:00 | GET detected
+04-15-15 00:19:00 | could not find driver
+04-15-15 00:19:00 | Ok to proxy
+04-15-15 00:19:00 | Proxy complete
+ 
+04-15-15 00:19:35 | GET detected
+04-15-15 00:19:35 | could not find driver
+04-15-15 00:19:35 | Ok to proxy
+04-15-15 00:19:35 | Proxy complete
+ 
+04-15-15 00:20:31 | GET detected
+04-15-15 00:20:31 | could not find driver
+04-15-15 00:20:31 | Ok to proxy
+04-15-15 00:20:31 | Proxy complete
+ 
+04-15-15 00:20:47 | GET detected
+04-15-15 00:20:47 | could not find driver
+04-15-15 00:20:47 | Ok to proxy
+04-15-15 00:20:47 | Proxy complete
+ 
+04-15-15 00:21:36 | GET detected
+04-15-15 00:21:36 | could not find driver
+04-15-15 00:21:36 | Ok to proxy
+04-15-15 00:21:36 | Proxy complete
+ 
+04-15-15 00:27:27 | GET detected
+04-15-15 00:27:27 | could not find driver
+04-15-15 00:27:27 | Ok to proxy
+04-15-15 00:27:27 | Proxy complete
+ 
+04-15-15 00:28:14 | GET detected
+04-15-15 00:28:14 | could not find driver
+04-15-15 00:28:14 | Ok to proxy
+04-15-15 00:28:14 | Proxy complete

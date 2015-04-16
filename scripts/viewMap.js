@@ -9,10 +9,11 @@ var mDates = undefined;
 var cntLayers;
 var cntErrLayers;
 var cntSucLayers;
+var mInfos;
 
 function mapReady() {
     // Инициализация окна c графиками
-    var mInfos = new dcrscplaneta.clsInfo();
+    mInfos = new dcrscplaneta.clsInfo();
     var idiw = dojo.byId("InfoWindow");
     idiw.style.top = '50px';
     mInfos.parent = idiw;
@@ -77,8 +78,10 @@ function mapReady() {
             mLegend.buildLegend(map);
             
             if (timeSlider != null) {
-                var endT = timeSlider.timeStops[timeSlider.timeStops.length - 1];
-                var stT = timeSlider.timeStops[0];
+                //var endT = timeSlider.timeStops[timeSlider.timeStops.length - 1];
+                //var stT = timeSlider.timeStops[0];
+                var stT = new Date(timeSlider.startTime - 12 * timeSlider.inpint * 3600000);
+                var endT = new Date(timeSlider.startTime + 12 * timeSlider.inpint * 3600000);
                 //var dde = endT.getUTCFullYear() + "-" + ("0" + (endT.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + endT.getUTCDate()).slice(-2) + " " + ("0" + endT.getUTCHours()).slice(-2) + ":00:00";
                 //var dds = stT.getUTCFullYear() + "-" + ("0" + (stT.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + stT.getUTCDate()).slice(-2) + " " + ("0" + stT.getUTCHours()).slice(-2) + ":00:00";
 
@@ -87,6 +90,7 @@ function mapReady() {
                     mDates.placeAt(dojo.byId("divDates"));
                 }
                 mDates.Reload(map, token, stT, endT);
+                timeSlider.onchange();
             }
         }
     });
@@ -105,7 +109,7 @@ function SetLayers() {
     //Disable all CheckBoxes
     var cBoxes = ["cbModis", "cbMeteor1", "cbKanopus", "cbLandsat8", "cbResursp", "cbFloodPolygons", "cbSnowMap", "cbSnowBorders", "cbMTSAT", "cbAscat",
                     "cbWaterLevel", "cbSnowDepth", "cbSnowDepth24", "cbMeteo", "cbWindSpeed", "cbWeatherEvent", "cbWeatherEventCol", "cbWeatherTmpIso", "cbWeatherPresIso",
-                    "cbGRIB", "cbHGTIsoline", "cbHGTField", "cbTMPIsoline", "cbTMPField", "cbRHIsoline", "cbRHField", "cbPRMSLIsoline", "cbPRMSLField", "cbGRIBWind",
+                    "cbHGTIsoline", "cbHGTField", "cbTMPIsoline", "cbTMPField", "cbRHIsoline", "cbRHField", "cbPRMSLIsoline", "cbPRMSLField", "cbGRIBWind",
                     "cbFloodPred", "cbZeyaForecast", "cbZeyaCOSMO", "cbZeyaNCEP", "cbZeyaUKMO", "cbZeyaJMA", "cbLevelForecast", "cbBorders", "cbGosg", "cbAdm1", "cbAdm2",
                     "cbRestricted", "cbZP", "cbNP", "cbFZ", "cbCity", "cbChis", "cbStatus", "cbRivers", "cbRoads", "cbShoreline"];
     for (var i = 0; i < cBoxes.length; i++) {
@@ -114,7 +118,7 @@ function SetLayers() {
     //Add attribData
     var lBorders = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/borders/MapServer", { id: "Bounds", visible: false }); cntLayers++;
     var lRestrict = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/restrict/MapServer", { id: "Restrict", visible: false }); cntLayers++;
-    var lCity = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/city/MapServer", { id: "City", visible: false }); cntLayers++;
+    var lCity = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/cities/MapServer", { id: "City", visible: false }); cntLayers++;
     var lRivers = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/rivers/MapServer", { id: "Rivers", visible: false }); cntLayers++;
     var lRoads = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/roads/MapServer", { id: "Roads", visible: false }); cntLayers++;
     var lShoreline = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/shoreline/MapServer", { id: "Shoreline", visible: false }); cntLayers++;
@@ -129,9 +133,12 @@ function SetLayers() {
     var snow_map = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/snow/snow_map_t/MapServer", { id: "SnowMap", visible: false }); cntLayers++;
     var snow_line = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/snow/snow_line_5_t/MapServer", { id: "SnowBorders", visible: false }); cntLayers++;
 
+    var clouds = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/clouds/clouds/MapServer", { id: "clouds", visible: false }); cntLayers++;
+    clouds.setImageFormat("png32");
+    
     // MTSAT
-    var clouds = new dcrscplaneta.WMSLayer({ url: ip_serv + "geoserver/dvrcpod/wms", after180: false, layer: "dvrcpod:clouds", id: "clouds", visible: false }); cntLayers++;
-    var cloudsAfter180 = new dcrscplaneta.WMSLayer({ url: ip_serv + "geoserver/dvrcpod/wms", after180: true, layer: "dvrcpod:clouds", id: "cloudsAfter180", visible: false }); cntLayers++;
+   // var clouds = new dcrscplaneta.WMSLayer({ url: ip_serv + "geoserver/dvrcpod/wms", after180: false, layer: "dvrcpod:clouds", id: "clouds", visible: false }); cntLayers++;
+   // var cloudsAfter180 = new dcrscplaneta.WMSLayer({ url: ip_serv + "geoserver/dvrcpod/wms", after180: true, layer: "dvrcpod:clouds", id: "cloudsAfter180", visible: false }); cntLayers++;
 
     //ASCAT
     var Ascat = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/ascat_soil_t/MapServer", { id: "Ascat", visible: false }); cntLayers++;
@@ -149,28 +156,54 @@ function SetLayers() {
         var meteo = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/stations/meteo/MapServer/?token=" + token, { id: "Meteo", visible: false }); cntLayers++;
         //Add Hgt
         var hgtiso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_hgt_iso/MapServer/?token=" + token, { id: "GRIB_HGT_ISO", visible: false }); cntLayers++;
+        hgtiso.leg_name = "Геопотенциал";
         hgtiso.setLevel("500");
-        var hgtfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_hgt_field/ImageServer/?token=" + token, { id: "GRIB_HGT_FIELD", visible: false }); cntLayers++;
+        var hgtfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_hgt_field_3/ImageServer/?token=" + token, { id: "GRIB_HGT_FIELD", visible: false }); cntLayers++;
+        hgtfld.leg_name = "[Гп.м]";
         hgtfld.setLevel("500");
-        hgtfld.setRenderRule();
+        //hgtfld.setRenderRule();
         //Add Tmp
         var tmpiso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_tmp_iso/MapServer/?token=" + token, { id: "GRIB_TMP_ISO", visible: false }); cntLayers++;
+        tmpiso.leg_name = "Температура";
         tmpiso.setLevel("500");
+        var tmpfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_temp_filed/ImageServer/?token=" + token, { id: "GRIB_TMP_FIELD", visible: false }); cntLayers++;
+        tmpfld.leg_name = "[°C]";
+        tmpfld.setLevel("500");
         //Add Rh
         var rhiso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_rh_iso/MapServer/?token=" + token, { id: "GRIB_RH_ISO", visible: false }); cntLayers++;
+        rhiso.leg_name = "Влажность";
         rhiso.setLevel("500");
+        var rhfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_rh_field_2/ImageServer/?token=" + token, { id: "GRIB_RH_FIELD", visible: false }); cntLayers++;
+        rhfld.leg_name = "[%]";
+        rhfld.setLevel("500");
+        // Add APCP
+        var apcpfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_apcp_field_2/ImageServer/?token=" + token, { id: "GRIB_APCP_FIELD", visible: false }); cntLayers++;        
+        apcpfld.setLevel();
         //Add PRMSL
-        var prmsliso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_prmsl_iso/MapServer/?token=" + token, { id: "GRIB_PRMSL_ISO", visible: false }); cntLayers++;
+        var prmsliso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_prmsl_iso_2/MapServer/?token=" + token, { id: "GRIB_PRMSL_ISO", visible: false }); cntLayers++;
+        prmsliso.leg_name = "Давление";
+        var prmslfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_prmsl_field_2/ImageServer/?token=" + token, { id: "GRIB_PRMSL_FIELD", visible: false }); cntLayers++;
+        prmslfld.leg_name = "[гПа]";
+        prmslfld.setLevel();
+        //Add WIND        
+        var windwrf = new dcrscplaneta.WSDGLayer();
+        windwrf.url = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer";
+        windwrf.id = "GRIB_WIND_BARBS";
+        windwrf.visible = false;
+        windwrf.nUrl = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/exportImage";
+        cntLayers++;
+        var windfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/?token=" + token, { id: "GRIB_WIND_FIELD", visible: false }); cntLayers++;        
+        windfld.setLevel("500");
 
         map.addLayers([modis, meteor, landsat, resurs, kanopus,
-                        floods, snow_map, snow_line, clouds, cloudsAfter180, Ascat,
-                        hgtfld,
+                        floods, snow_map, snow_line, clouds, Ascat,
+                        hgtfld, tmpfld, rhfld, apcpfld, prmslfld, windfld,
                         hydro, snow, snow24, meteo,
-                        borsh, borsh2, hgtiso, tmpiso, rhiso, prmsliso,
+                        borsh, borsh2, hgtiso, tmpiso, rhiso, prmsliso, windwrf,
                         lBorders, lRestrict, lCity, lRivers, lRoads, lShoreline]);
     } else {
         map.addLayers([modis, meteor, landsat, resurs, kanopus,
-                        floods, snow_map, snow_line, clouds, cloudsAfter180, Ascat,
+                        floods, snow_map, snow_line, clouds, Ascat,
                         borsh, borsh2,
                         lBorders, lRestrict, lCity, lRivers, lRoads, lShoreline]);
     }

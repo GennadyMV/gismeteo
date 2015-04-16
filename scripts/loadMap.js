@@ -24,6 +24,7 @@ function initMap() {
     basemaps.push(new esri.dijit.Basemap({
         layers: [new esri.dijit.BasemapLayer({ url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer" })],
         title: "Вид со спутника",
+        id: "BaseMapImagery",
         thumbnailUrl: "images/thumbnail/t_sat.png"
     }));
     basemaps.push(new esri.dijit.Basemap({
@@ -38,27 +39,40 @@ function initMap() {
         thumbnailUrl: "images/thumbnail/t_osm.png"
     }));
 
-    var basemapGallery = new esri.dijit.BasemapGallery({
+    basemapGallery = new esri.dijit.BasemapGallery({
         basemaps: basemaps,
         showArcGISBasemaps: false,
         map: map
     }, "basemapGalleryDiv");
     basemapGallery.startup();
     basemapGallery.on("error", function (msg) { console.log("basemap gallery error:  ", msg); });
+
     // Инициализируем timeSlider
-    initSlider();
+    //initSlider();
+    initTimeSlider("timeWindow");
     // Действия после загрузки карты
-   map.on("load", function () {
+    map.on("load", function () {
         new esri.dijit.Scalebar({ map: map, scalebarUnit: "metric" });
         new esri.dijit.OverviewMap({ map: map }, dojo.byId('overviewMapDiv')).startup();
         dojo.style(dojo.byId("overviewMapWindow"), "display", "none")
-
        //SetLayers();
        //initSlider();
        //refreshSlider();
-
        mapReady();
-   });
+    });
+    map.on("update-start", showLoading);
+    map.on("update-end", hideLoading);
+    function showLoading() {
+        esri.show(dojo.byId("loadingImg"));
+        map.disableMapNavigation();
+        //map.hideZoomSlider();
+    }
+
+    function hideLoading(error) {
+        esri.hide(dojo.byId("loadingImg"));
+        map.enableMapNavigation();
+        //map.showZoomSlider();
+    }
 };
 
 function initSlider() {
@@ -121,14 +135,14 @@ function initSlider() {
         var dds = timeStart.getUTCFullYear() + "-" + ("0" + (timeStart.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + timeStart.getUTCDate()).slice(-2) + " " + ("0" + timeStart.getUTCHours()).slice(-2) + ":00:00";
 
         //Set WMS Clouds
-        map.getLayer("clouds").setTime(dd);
-        map.getLayer("cloudsAfter180").setTime(dd);
+    //    map.getLayer("clouds").setTime(dd);
+    //    map.getLayer("cloudsAfter180").setTime(dd);
     //    map.getLayer("mega").setTime(dd);
         //Set Rasters
-        var RastersLayer = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
-        for (var i = 0; i < RastersLayer.length; i++) {
-            map.getLayer(RastersLayer[i]).setDefinitionExpression("DataDateTime between date '" + dds + "' and date '" + dde + "'", true);
-        }
+        //var RastersLayer = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
+        //for (var i = 0; i < RastersLayer.length; i++) {
+        //    map.getLayer(RastersLayer[i]).setDefinitionExpression("DataDateTime between date '" + dds + "' and date '" + dde + "'", true);
+        //}
         if (mDates != undefined) {
             mDates.SetTime(dds, dde);
         }
@@ -136,6 +150,7 @@ function initSlider() {
         if (mDates != undefined) {
             mDates.Select(dds, dde);
         }
+        refreshSlider2();
 
 
     });
@@ -171,5 +186,39 @@ function refreshSlider() {
     });
 
     timeSlider.setLabels(labels);
-    if (mDates != undefined)  mDates.Refresh(stT, endT);
+    if (mDates != undefined) mDates.Refresh(stT, endT);
+
+};
+
+function refreshSlider2() {
+    if (dojo.byId("tDTStart") == null || timeSlider == null) return;
+    //var ft = dojo.byId("tDTStart").value.substring(6, 10) + "-" + dojo.byId("tDTStart").value.substring(3, 5) + "-" + dojo.byId("tDTStart").value.substring(0, 2) + "T" + dojo.byId("tDTStart").value.substring(11) + "Z";
+
+    //var stT = new Date(timeSlider.timeStops[0].getTime() + stI * 3600000);
+    var stI = dojo.byId("intervals").value;
+    var stT = new Date(timeSlider.timeStops[0].getTime() + stI * 3600000);
+    var CInt = 24;
+    var endT = new Date(stT.getTime() + CInt * stI * 3600000);
+    var timeExtent = new esri.TimeExtent(stT, endT);
+
+
+    timeSlider.setThumbCount(2);
+    timeSlider.createTimeStopsByTimeInterval(timeExtent, stI, "esriTimeUnitsHours");
+    timeSlider.setThumbIndexes([0, 1]);
+    timeSlider.setThumbMovingRate(2000);
+
+    timeSlider.startup();
+
+    //add labels for every other time stop
+    var labels = dojo._base.array.map(timeSlider.timeStops, function (timeStop, i) {
+        if (i % 2 === 0) {
+            var dd = (timeStop.getUTCHours() == 0) ? ("0" + timeStop.getUTCDate()).slice(-2) + "." + ("0" + (timeStop.getUTCMonth() + 1)).slice(-2) : ("0" + timeStop.getUTCHours()).slice(-2) + ":00";
+            return dd;
+        } else {
+            return "";
+        }
+    });
+
+    timeSlider.setLabels(labels);
+    if (mDates != undefined) mDates.Refresh(stT, endT);
 };

@@ -5,7 +5,7 @@
                             '<canvas data-dojo-attach-point="Legend" style="margin: 0px 0px 0px 0px"></canvas>' +
                             '<div data-dojo-attach-point="leftLegend" style="position:absolute; top:0px; left:0px; width:25px; height:40px;"></div>' +
                             '<div data-dojo-attach-point="rightLegend" style="position:absolute; top:0px; left:455px; width:25px; height:40px;"></div>' +
-                            '<div data-dojo-attach-point="LoadIcon" style="position:absolute; margin-left:-32px; margin-top:-32px; top:50%; left:50%; z-index:90"><img src="./images/loadGlobe.gif"/></div>' +
+                            '<div data-dojo-attach-point="LoadIcon" style="position:absolute; margin-left:-50px; margin-top:-50px; top:50%; left:50%; z-index:90"><img src="./images/loadingImage.gif"/></div>' +
                         '</div>',
         width: 500,height: 800, lheight: 50,
         graphCount: 0, stack: undefined, stackMin: undefined, stackMax: undefined, stackDiv: undefined,
@@ -46,7 +46,7 @@
                         var py0 = this.stack[j][i][1]; //this.height - (this.stack[0][i][1] - this.stackMin[0]) / (this.stackMax[0] - this.stackMin[0]) * this.height;
                         var py1 = this.stack[j][i + 1][1];//this.height - (this.stack[0][i + 1][1] - this.stackMin[0]) / (this.stackMax[0] - this.stackMin[0]) * this.height;
                         var y = ((px - px0) / (px1 - px0)) * (py1 - py0) + py0;
-                        this.stackDiv[j].innerText = y.toFixed(2).toString();
+                        this.stackDiv[j].innerHTML = y.toFixed(2).toString();
                         var py = this.height - (y - this.stackMin[j]) / (this.stackMax[j] - this.stackMin[j]) * this.height;
                         this.stackDiv[j].style.top = py - 6 + "px";
                         break;
@@ -213,7 +213,7 @@
                 var val = min + i * step;
                 var py = this.height - (val - min) / (max - min) * this.height;                
                 var d = document.createElement('div');
-                d.innerText = val.toFixed(fix).toString();;
+                d.innerHTML = val.toFixed(fix).toString();
                 d.style.position = "absolute";
                 d.style.color = "black";
                 d.style.right = "0px";
@@ -229,7 +229,7 @@
                 var val = min + i * step;
                 var py = this.height - (val - min) / (max - min) * this.height;
                 var d = document.createElement('div');
-                d.innerText = val.toFixed(fix).toString();;
+                d.innerHTML = val.toFixed(fix).toString();
                 d.style.position = "absolute";
                 d.style.color = "black";
                 d.style.left = "0px";
@@ -410,8 +410,8 @@
                 this.infoDiv.style.top = y - 15 + 'px';
                 var j = parseInt((this.height - (y - 15)) / (this.height) * (this.arrT[0].length - 1));
                 var i = parseInt(x / this.width * (this.arrT.length-1))
-                this.tmpVal.innerText = this.arrT[i][j].toFixed(1).toString();
-                this.rhVal.innerText = this.arrP[i][j].toFixed(0).toString();
+                this.tmpVal.innerHTML = this.arrT[i][j].toFixed(1).toString();
+                this.rhVal.innerHTML = this.arrP[i][j].toFixed(0).toString();
                 var k = 9;
             } else {
                 this.infoDiv.style.display = 'none';
@@ -447,7 +447,7 @@
                 var val = min + i * step;
                 var py = this.height - (val - min) / (max - min) * this.height;
                 var d = document.createElement('div');
-                d.innerText = val.toFixed(fix).toString();;
+                d.innerHTML = val.toFixed(fix).toString();
                 d.style.position = "absolute";
                 d.style.color = "black";
                 d.style.right = "0px";
@@ -463,7 +463,7 @@
                 var val = min + i * step;
                 var py = this.height - (val - min) / (max - min) * this.height;
                 var d = document.createElement('div');
-                d.innerText = val.toFixed(fix).toString();;
+                d.innerHTML = val.toFixed(fix).toString();
                 d.style.position = "absolute";
                 d.style.color = "black";
                 d.style.left = "0px";
@@ -803,7 +803,7 @@
         postCreate: function () {
             //add labels for every other time stop
             var step = (430) / 24; // width(500) - width_scr(20) - width_graph_val(25)*2
-            var sDate = Date.UTC(2015, 02, 25, 12, 0, 0, 0);
+            var sDate = Date.UTC(2015, 03, 7, 00, 0, 0, 0);
             this.xTimes = [];
             for (var i = 0; i < 25; i++) {
                 var endT = new Date(sDate + i * 3 * 3600000);
@@ -831,7 +831,43 @@
                 }
             }            
         },
+        setDateInt: function (startDate, Int) {
+            // clear old
+            while (this.dDatesT.firstChild) this.dDatesT.removeChild(this.dDatesT.firstChild);
+            while (this.dDatesB.firstChild) this.dDatesB.removeChild(this.dDatesB.firstChild);
+            this.xTimes = [];
+            //add labels for every other time stop
+            var step = (430) / 24; // width(500) - width_scr(20) - width_graph_val(25)*2
+            var sDate = startDate
+            this.xTimes = [];
+            for (var i = 0; i < 25; i++) {
+                var endT = new Date(sDate + i * Int * 3600000);
+                this.xTimes.push(endT.getTime());
+                if (i % 2 === 0) {
+                    var dd = '<p class="thick">' + ("0" + endT.getUTCDate()).slice(-2) + "." + ("0" + (endT.getUTCMonth() + 1)).slice(-2) + '</p><p class="normal">' + ("0" + endT.getUTCHours()).slice(-2) + ":00</p>";
+                    var d = document.createElement('div');
+                    d.innerHTML = dd;
+                    d.style.position = "absolute";
+                    d.style.color = (i % 4 == 0) ? "black" : "gray";
+                    d.style.left = (12 + i * step) + "px";
+                    d.style.top = "0px";
+                    d.style.fontSize = "8pt";
+                    this.dDatesT.appendChild(d);
+
+                    var dd = '<p class="normal">' + ("0" + endT.getUTCHours()).slice(-2) + ':00</p><p class="thick">' + ("0" + endT.getUTCDate()).slice(-2) + "." + ("0" + (endT.getUTCMonth() + 1)).slice(-2) + '</p>';
+                    var d = document.createElement('div');
+                    d.innerHTML = dd;
+                    d.style.position = "absolute";
+                    d.style.color = (i % 4 == 0) ? "black" : "gray";
+                    d.style.left = (12 + i * step) + "px";
+                    d.style.bottom = "0px";
+                    d.style.fontSize = "8pt";
+                    this.dDatesB.appendChild(d);
+                }
+            }
+        },
         mouseMove: function (evt) {
+            var a = evt.currentTarget.getBoundingClientRect();
             this.dLine.style.left = evt.clientX - parseInt(this.parent.style.left) + "px";            
             if ((parseInt(this.dLine.style.left) < 25) || (parseInt(this.dLine.style.left) > 455)) {
                 this.dLine.style.display = 'none';
@@ -880,20 +916,22 @@
             identifyTask.execute(identifyParams, function (idResults) {
                 if (idResults.length > 0) {
                     if (idResults[0].layerId == 0) {
-                        papa.Value.stName.innerText = idResults[0].feature.attributes.name;
-                        papa.Value.stIndex.innerText = idResults[0].feature.attributes.id;
+                        papa.Value.stName.innerHTML = idResults[0].feature.attributes.name;
+                        papa.Value.stIndex.innerHTML = idResults[0].feature.attributes.id;
                         papa.Value.stInfo.style.display = 'block';
                         papa.Value.dArea.style.display = 'none';                        
                     } else {
-                        papa.Value.stPosArea.innerText = idResults[0].feature.attributes.NA2_DESC_1 +
+                        papa.Value.stPosArea.innerHTML = idResults[0].feature.attributes.NA2_DESC_1 +
                             ((idResults[0].feature.attributes.Name_adm_1 === " ") ? '' : ', ' + idResults[0].feature.attributes.Name_adm_1) +
                             ((idResults[0].feature.attributes.Name_adm_2 === " ") ? '' : ', ' + idResults[0].feature.attributes.Name_adm_2);
                         papa.Value.stInfo.style.display = 'none';
                         papa.Value.dArea.style.display = 'block';
                     }
                     var reflat = { x: 0, y: 0 };
-                    ToGeographic(event.mapPoint.x, event.mapPoint.y, reflat);
-                    papa.Value.dAreaLL.innerText = reflat.x.toFixed(2).toString() + ', ' + reflat.y.toFixed(2).toString();
+                    var latitude = event.mapPoint.getLatitude();
+                    var longitude = event.mapPoint.getLongitude();
+                    //ToGeographic(event.mapPoint.x, event.mapPoint.y, reflat);
+                    papa.Value.dAreaLL.innerHTML = longitude.toFixed(2).toString() + ', ' + latitude.toFixed(2).toString();
                 }
                 
             }, null);

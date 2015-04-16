@@ -68,8 +68,7 @@ function (dom, on) {
     on(dom.byId("cbSnowMap"), "change", CheckCheck);
     on(dom.byId("cbSnowBorders"), "change", CheckCheck);
     on(dom.byId("cbAscat"), "change", CheckCheck);
-    // FORECAST WRF
-    on(dom.byId("cbGRIB"), "change", CheckCheck);
+    // FORECAST WRF    
     on(dom.byId("cbHGTIsoline"), "change", CheckCheck);
     on(dom.byId("cbTMPIsoline"), "change", CheckCheck);
     on(dom.byId("cbRHIsoline"), "change", CheckCheck);
@@ -79,6 +78,8 @@ function (dom, on) {
     on(dom.byId("cbRHField"), "change", CheckCheck);
     on(dom.byId("cbPRMSLField"), "change", CheckCheck);
     on(dom.byId("cbGRIBWind"), "change", CheckCheck);
+    on(dom.byId("cbAPCPField"), "change", CheckCheck);
+    on(dom.byId("cbGRIBWindF"), "change", CheckCheck);
 
     function CheckCheck(event) {        
         switch (event.target.id)
@@ -197,10 +198,9 @@ function (dom, on) {
             case "cbMTSAT":
                 if (dojo.byId('cbMTSAT').checked) {
                     map.getLayer("clouds").show();
-                    map.getLayer("cloudsAfter180").show();
+                    basemapGallery.select("BaseMapImagery");
                 } else {
                     map.getLayer("clouds").hide();
-                    map.getLayer("cloudsAfter180").hide();
                 }
                 break;
             case "cbSnowMap":
@@ -221,17 +221,36 @@ function (dom, on) {
             case "cbRHIsoline":
                 if (dojo.byId('cbRHIsoline').checked) map.getLayer("GRIB_RH_ISO").show(); else map.getLayer("GRIB_RH_ISO").hide();
                 break;
+            case "cbRHField":
+                if (dojo.byId('cbRHField').checked) map.getLayer("GRIB_RH_FIELD").show(); else map.getLayer("GRIB_RH_FIELD").hide();
+                break;
             case "cbTMPIsoline":
                 if (dojo.byId('cbTMPIsoline').checked) map.getLayer("GRIB_TMP_ISO").show(); else map.getLayer("GRIB_TMP_ISO").hide();
                 break;
+            case "cbTMPField":
+                if (dojo.byId('cbTMPField').checked) map.getLayer("GRIB_TMP_FIELD").show(); else map.getLayer("GRIB_TMP_FIELD").hide();
+                break;
             case "cbPRMSLIsoline":
                 if (dojo.byId('cbPRMSLIsoline').checked) map.getLayer("GRIB_PRMSL_ISO").show(); else map.getLayer("GRIB_PRMSL_ISO").hide();
+                break;
+            case "cbPRMSLField":
+                if (dojo.byId('cbPRMSLField').checked) map.getLayer("GRIB_PRMSL_FIELD").show(); else map.getLayer("GRIB_PRMSL_FIELD").hide();
+                break;
+            case "cbAPCPField":
+                if (dojo.byId('cbAPCPField').checked) map.getLayer("GRIB_APCP_FIELD").show(); else map.getLayer("GRIB_APCP_FIELD").hide();
+                break;                
+            case "cbGRIBWind":
+                if (dojo.byId('cbGRIBWind').checked) map.getLayer("GRIB_WIND_BARBS").show(); else map.getLayer("GRIB_WIND_BARBS").hide();
+                break;
+            case "cbGRIBWindF":
+                if (dojo.byId('cbGRIBWindF').checked) map.getLayer("GRIB_WIND_FIELD").show(); else map.getLayer("GRIB_WIND_FIELD").hide();
                 break;
             default:
             break;
         }
 
         if (mDates != undefined) mDates.refreshVisible();
+        if (mLegend != undefined) mLegend.refreshVisible();
         //RefreshLegend(map, "legendDiv");
     }
 

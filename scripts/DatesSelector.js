@@ -14,20 +14,24 @@ function initDatesSelector() {
             dList.Value.removeChild(dList.Value.firstChild);
         }
         if (dates.length == 0) {
-            dList.Value.innerText = "За выбранные период нет данных";
+            if ((dList.Value.maxDate != undefined) && (dList.Value.maxDate != '')) {
+                dList.Value.innerHTML = "За выбранные период нет данных (Последнии данные за " + dList.Value.maxDate + ")";
+            } else {
+                dList.Value.innerHTML = "За выбранные период нет данных";
+            }
         } else {
             var listElement = document.createElement("ul");
             dList.Value.appendChild(listElement);
-
-
             for (var i = 0; i < dates.length; i++) {
                 var listItem = document.createElement("li");
                 var checkbox = document.createElement('input');
                 checkbox.type = "checkbox";
                 //var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
                 var a = map.getLayer(dList.id).__proto__.declaredClass;
-                if ((a === "esri.layers.ArcGISImageServiceLayer") || (a === "dcrscplaneta.clsChangeItemDMSLField")) {
+                if (a === "esri.layers.ArcGISImageServiceLayer") {
                     checkbox.onchange = function mfk(evt) { SupaSelectImage(dList.id) };
+                } else if (a === "dcrscplaneta.clsChangeItemDMSLField") {
+                    checkbox.onchange = function mfk(evt) { SupaSelectImageB(dList.id) };
                 } else {
                     checkbox.onchange = function mfk(evt) { SupaSelectMap(dList.id) };
                 }
@@ -36,7 +40,7 @@ function initDatesSelector() {
                 checkbox.checked = (dates[i] <= map.timeExtent.endTime && dates[i] >= map.timeExtent.startTime) ? true : false;
                 listItem.appendChild(checkbox);
                 var span = document.createElement('span');
-                span.innerText = dText;
+                span.innerHTML = dText;
                 listItem.appendChild(span);
                 listElement.appendChild(listItem);
             }
@@ -45,7 +49,6 @@ function initDatesSelector() {
 
     function SupaSelectImage(id) {
         if (mDates.Layers != undefined) {
-
             for (var i = 0; i < mDates.Layers.length; i++) {
                 if (mDates.Layers[i].id == id) {
                     var inSelect = '';
@@ -59,13 +62,51 @@ function initDatesSelector() {
                                 var pS = new Date(compDate.getTime() + 1000);
                                 var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
                                 //inSelect += " OR datadatetime between date'" + tmS + "' and date'" + tpS +"'";
-                                inSelect += " OR ((datadatetime > date '" + tmS + "') and datadatetime < (date'" + tpS + "'))"
+                                inSelect += " OR ((datadatetime > date '" + tmS + "') and datadatetime < (date '" + tpS + "'))"
                             }
                         }
                     }
                     inSelect = inSelect.substring(4);
                     if (inSelect == "") {
-                        inSelect = "datadatetime < date'0001-01-01'";
+                        inSelect = "datadatetime < date '0001-01-01'";
+                        //disable checkbox
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = false; }
+                        map.getLayer(id).hide();
+                    } else {
+                        //if checkbox disable enabled
+                        for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = true; }
+                        map.getLayer(id).show()
+                    }
+                    mDates.refreshVisible();
+                    map.getLayer(id).setDefinitionExpression(inSelect);
+                }
+            }
+        }
+        mDates.Layers.length
+    }
+
+    function SupaSelectImageB(id) {
+        if (mDates.Layers != undefined) {
+            for (var i = 0; i < mDates.Layers.length; i++) {
+                if (mDates.Layers[i].id == id) {
+                    var inSelect = '';
+                    if (mDates.Layers[i].datesList.childNodes[0].childNodes.length != 0) {
+                        for (var j = 0; j < mDates.Layers[i].datesList.childNodes[0].childNodes.length; j++) {
+                            var compDate = new Date(mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].value);
+                            if (mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[0].checked) {
+                                //inSelect += ", date'" + mDates.Layers[i].datesList.childNodes[0].childNodes[j].childNodes[1].innerText + "'";
+                                var mS = new Date(compDate - 1000);
+                                var tmS = mS.getUTCFullYear() + "-" + ("0" + (mS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + mS.getUTCDate()).slice(-2) + " " + ("0" + mS.getUTCHours()).slice(-2) + ":" + ("0" + mS.getUTCMinutes()).slice(-2) + ":" + ("0" + mS.getUTCSeconds()).slice(-2);
+                                var pS = new Date(compDate.getTime() + 1000);
+                                var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
+                                //inSelect += " OR datadatetime between date'" + tmS + "' and date'" + tpS +"'";
+                                inSelect += " OR ((datadatetime > '" + tmS + "') and (datadatetime < '" + tpS + "'))"
+                            }
+                        }
+                    }
+                    inSelect = inSelect.substring(4);
+                    if (inSelect == "") {
+                        inSelect = "datadatetime < '0001-01-01'";
                         //disable checkbox
                         for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = false; }
                         map.getLayer(id).hide();
@@ -97,7 +138,7 @@ function initDatesSelector() {
                                 var tmS = mS.getUTCFullYear() + "-" + ("0" + (mS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + mS.getUTCDate()).slice(-2) + " " + ("0" + mS.getUTCHours()).slice(-2) + ":" + ("0" + mS.getUTCMinutes()).slice(-2) + ":" + ("0" + mS.getUTCSeconds()).slice(-2);
                                 var pS = new Date(compDate.getTime() + 1000);
                                 var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
-                                inSelect += " OR " + tfield + " between date'" + tmS + "' and date'" + tpS + "'";
+                                inSelect += " OR " + tfield + " between '" + tmS + "' and '" + tpS + "'";
                             }
                         }
                     }
@@ -152,6 +193,36 @@ function initDatesSelector() {
                             '</div>',
             url: '',
             id: '',
+            timeInfo: '',
+            maxDate: '',
+            'initLayer': function () {
+                var tfield = lDConfig[this.id].dField;//TimeSoop[this.id];                
+                if (lDConfig[this.id].hasOwnProperty("dbname")) {
+                    var dbname = lDConfig[this.id].dbname;//TimeSoop[this.id];
+                    var queryTask = new esri.tasks.QueryTask(this.url);
+                    var query = new esri.tasks.Query();
+                    query.returnGeometry = false;
+                    query.outFields = [tfield];
+                    query.orderByFields = [tfield];
+                    query.returnDistinctValues = true;
+                    var a = map.getLayer(this.id).__proto__.declaredClass;                    
+                    query.where = tfield + " = (SELECT MAX(" + tfield + ") FROM " + dbname + ")";
+                    var x = { Value: this.datesList, id: this.id, tfield: tfield };
+                    queryTask.execute(query, function mf(evt) {
+                        for (var i = 0; i < evt.features.length; i++) {
+                            var dat = JSON.stringify(evt.features[i].attributes);//.toString();//.$tField;// .attributes[tField];
+                            if (dat.indexOf(x.tfield) > 0) {
+                                var dtime = dat.split(/[:{}]/);
+                                var DD = new Date(+dtime[2]);
+                                x.Value.maxDate = DD.getUTCFullYear() + "-" + ("0" + (DD.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + DD.getUTCDate()).slice(-2) + " " + ("0" + DD.getUTCHours()).slice(-2) + ":" + ("0" + DD.getUTCMinutes()).slice(-2) + ":" + ("0" + DD.getUTCSeconds()).slice(-2);
+                            }
+                        }
+                    }, function mfe(evt) {
+                        var k = 9;
+                    });
+                }
+                
+            },
             'ShowHideTreeView': function () {
                 if (this.datesList.classList.contains("selected")) {
                     this.datesList.setAttribute("class", "tree-view");
@@ -169,7 +240,12 @@ function initDatesSelector() {
                 query.outFields = [tfield];
                 query.orderByFields = [tfield];
                 query.returnDistinctValues = true;
-                query.where = tfield + " between date'" + ds + "' AND date'" + de + "'";
+                var a = map.getLayer(this.id).__proto__.declaredClass;
+                if ((a === "esri.layers.ArcGISImageServiceLayer") || (a === "dcrscplaneta.clsChangeItemDMSLField")) {
+                    query.where = tfield + " between date '" + ds + "' AND date '" + de + "'";
+                } else {
+                    query.where = tfield + " between '" + ds + "' AND '" + de + "'";
+                }
                 var x = { Value: this.datesList, id: this.id };
                 queryTask.execute(query,
                     function mf(evt) { dcrscplaneta_GetDates(x, evt) }, 
@@ -219,7 +295,11 @@ function initDatesSelector() {
                     return;
                 }
                 if (map.getLayer(this.id).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSLField") {//Image.indexOf(this.id) > -1) {
-                    map.getLayer(this.id).setDefinitionExpression("datadatetime between date '" + ds + "' and date '" + de + "'");
+                    map.getLayer(this.id).setDefinitionExpression("datadatetime between '" + ds + "' and '" + de + "'");
+                    return;
+                }
+                if (map.getLayer(this.id).__proto__.declaredClass === "dcrscplaneta.WSDGLayer") {//Image.indexOf(this.id) > -1) {
+                    map.getLayer(this.id).setTime("datadatetime between '" + ds + "' and '" + de + "'");                    
                     return;
                 }
                 if (map.getLayer(this.id).__proto__.declaredClass === "esri.layers.ArcGISDynamicMapServiceLayer") {
@@ -267,7 +347,7 @@ function initDatesSelector() {
             },
             'Reload': function (map, token, ds, de) {
                 //Clear Old
-                this.Layers = [];
+                this.Layers = new Array();// [];
                 while (this.container.firstChild) {
                     this.container.removeChild(this.container.firstChild);
                 }
@@ -277,9 +357,26 @@ function initDatesSelector() {
                 for (var i = 0; i < map.layerIds.length; i++) {
                     if (lDConfig[map.layerIds[i]].dField != "") {
                         var tVar = new dcrscplaneta.DatesSelector();
-                        tVar.titleNode.innerText = lDConfig[map.layerIds[i]].visName;
+                        tVar.titleNode.innerHTML = lDConfig[map.layerIds[i]].visName
                         tVar.url = map.getLayer(map.layerIds[i]).url;
                         tVar.id = map.layerIds[i];
+                        if (tVar.url.indexOf("/ImageServer") < 0) {
+                            var layerid = lDConfig[map.layerIds[i]].hasOwnProperty("datefromlayer") ? lDConfig[map.layerIds[i]].datefromlayer : 0;
+                            if (tVar.url.indexOf("/?token=") > -1) { tVar.url = tVar.url.substr(0, tVar.url.indexOf("/?token=")) + "/"+layerid+"?token=" + token; } else { tVar.url = tVar.url + "/"+layerid; }                            
+                        }
+                        tVar.initLayer();
+                        tVar.Reload(dds, dde);
+                        this.Layers.push(tVar);
+                        tVar.placeAt(this.container);
+                     //   this.container.appendChild(tVar.domNode);
+                    }
+                }
+                for (var i = 0; i < map.graphicsLayerIds.length; i++) {
+                    if (lDConfig[map.graphicsLayerIds[i]].dField != "") {
+                        var tVar = new dcrscplaneta.DatesSelector();
+                        tVar.titleNode.innerHTML = lDConfig[map.graphicsLayerIds[i]].visName;
+                        tVar.url = map.getLayer(map.graphicsLayerIds[i]).url;
+                        tVar.id = map.graphicsLayerIds[i];
                         if (tVar.url.indexOf("/ImageServer") < 0) {
                             if (tVar.url.indexOf("/?token=") > -1) { tVar.url = tVar.url.substr(0, tVar.url.indexOf("/?token=")) + "/0?token=" + token; } else { tVar.url = tVar.url + "/1"; }
                         }
