@@ -192,6 +192,7 @@ require([
                 papa.value.SwapVisElements(lid, ord);
             };
             // clear Legend
+            this.elements = new Array();
             while (this.domNode.firstChild) this.domNode.removeChild(this.domNode.firstChild); // clear container
             // Read map Layers
             for (var i = 0; i < map.layerIds.length; i++) {

@@ -1,13 +1,12 @@
 ﻿//Init queryTaskSearch
 // Используется для поиска станций, городов и рек по названиям
-require(["esri/tasks/QueryTask", "esri/tasks/query"], function (QueryTask, Query) {
-    queryTaskSearch = new QueryTask(ip_serv + "arcgis/rest/services/attrib/statsearch/MapServer/0");
-    querySearch = new Query();
-    querySearch.returnGeometry = true;
-    querySearch.outFields = ["name", "id", "station_ty"];
-});
+
 
 function executeQuerySearch(name) {
+    var queryTaskSearch = new esri.tasks.QueryTask(ip_serv + "arcgis/rest/services/attrib/statsearch/MapServer/0");
+    var querySearch = new esri.tasks.Query();
+    querySearch.returnGeometry = true;
+    querySearch.outFields = ["name", "id", "station_ty"];
     querySearch.where = "UPPER(NAME) LIKE UPPER('" + name + "%') OR id LIKE UPPER('" + name + "%')";
     queryTaskSearch.execute(querySearch, showResults);
 }

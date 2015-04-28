@@ -66,8 +66,52 @@ function initTimeSlider(objSet) {
     zxcAnimate.prototype.Complete = function () { if (this.smeh != 0) this.papa.reinit(this.smeh); }
 
     dojo.declare('fesrcplaneta.timeSlider', [dijit._Widget, dijit._Templated], {
-        templateString: '<div class="trest" style="position:relative; width:100%; height:100%" onSelectStart="return false">' +
-                            '<div class="CommonBorder BackgroundBorder trest2" style="position:absolute; left:30px; width:561px; height:40px; padding: 5px;">' +
+        templateString: '<div class="trest" style="position:relative; width:100%; height:100%" onSelectStart="return false" dojoAttachEvent="onMouseOut:hideCalendarI">' +
+                            '<div data-dojo-attach-point="dSettings" class="CommonBorder BackgroundBorder trest2" style="position:absolute; left:30px; width:561px; height:40px; padding: 5px;">' +
+                                '<div style="position:relative; width:0px; height:0px;">' +
+                                    '<div data-dojo-attach-point="dCalendar"  class="calendarDiv">' +
+                                        '<table style="width:100%; table-layout: fixed;" border="0" cellspacing="0">' +
+                                            '<col style="width: 30px;"/><col style="width: 30px;"/><col style="width: 30px;"/><col style="width: 30px;"/><col style="width: 30px;"/><col style="width: 30px;"/><col style="width: 30px;"/>' +
+                                            '<tr style="height: 40px;">' +
+                                                '<td><div style="width:20px; height:20px; background-image:url(images/addicon/btn_dleft.png);" dojoAttachEvent="onClick:minusMonth"></div></td>' +
+                                                '<td colspan="5">' +
+                                                    '<span style="position:relative; border-radius:5px; border:1px solid black; padding:0px 5px 1px 5px; margin-left:10px; margin-right:10px; background:white; cursor: pointer;">' +
+                                                        '<span data-dojo-attach-point="dMonth" dojoAttachEvent="onClick:showMonthS" style="width:30px; display:inline-block; font-size:14px;">Янв</span>' +
+                                                            '<div data-dojo-attach-point="dMonthS" dojoAttachEvent="onMouseMove:hideMonthS" class="selectOptions" style=" left:-1px; top:-1px; background:white; font-size:14px; height:200px; width:40px; border-radius:5px; border:1px solid black;">' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Янв</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Фев</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Мар</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Апр</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Май</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Июн</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Июл</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Авг</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Сен</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Окт</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Ноя</span>' +
+                                                                '<span dojoAttachEvent="onClick:setMonth" class="selectOption">Дек</span>' +
+                                                            '</div>' +
+                                                        '</span>' +
+                                                    '</span>' +
+                                                    '<span style="position:relative; border-radius:5px; border:1px solid black; padding:0px 5px 1px 5px; margin-left:10px; margin-right:10px; background:white; cursor: pointer;">' +
+                                                        '<span data-dojo-attach-point="dYear" dojoAttachEvent="onClick:showYearS" style="width:30px; display:inline-block; font-size:14px;">2015</span>' +
+                                                            '<div data-dojo-attach-point="dYearS" dojoAttachEvent="onMouseMove:hideYearS" class="selectOptions" style=" left:-1px; top:-1px; background:white; font-size:14px; height:200px; width:40px; border-radius:5px; border:1px solid black;">' +
+                                                            '</div>' +
+                                                        '</span>' +
+                                                    '</span>' +
+                                                '</td>' +
+                                                '<td><div style="width:20px; height:20px; background-image:url(images/addicon/btn_dright.png);" dojoAttachEvent="onClick:plusMonth"></div></td>' +
+                                            '</tr>' +
+                                            '<tr><td>Пн</td><td class="bl">Вт</td><td class="bl">Ср</td><td class="bl">Чт</td><td class="bl">Пт</td><td class="bl">Сб</td><td class="bl">Вс</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d01" dojoAttachEvent="onClick:setDay" class="ptr"> 1</td><td data-dojo-attach-point="d02" dojoAttachEvent="onClick:setDay" class="bl ptr"> 2</td><td data-dojo-attach-point="d03" dojoAttachEvent="onClick:setDay" class="bl ptr"> 3</td><td data-dojo-attach-point="d04" dojoAttachEvent="onClick:setDay" class="bl ptr"> 4</td><td data-dojo-attach-point="d05" dojoAttachEvent="onClick:setDay" class="bl ptr"> 5</td><td data-dojo-attach-point="d06" dojoAttachEvent="onClick:setDay" class="bl ptr"> 6</td><td data-dojo-attach-point="d07" dojoAttachEvent="onClick:setDay" class="bl ptr"> 7</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d08" dojoAttachEvent="onClick:setDay" class="ptr"> 8</td><td data-dojo-attach-point="d09" dojoAttachEvent="onClick:setDay" class="bl ptr"> 9</td><td data-dojo-attach-point="d10" dojoAttachEvent="onClick:setDay" class="bl ptr">10</td><td data-dojo-attach-point="d11" dojoAttachEvent="onClick:setDay" class="bl ptr">11</td><td data-dojo-attach-point="d12" dojoAttachEvent="onClick:setDay" class="bl ptr">12</td><td data-dojo-attach-point="d13" dojoAttachEvent="onClick:setDay" class="bl ptr">13</td><td data-dojo-attach-point="d14" dojoAttachEvent="onClick:setDay" class="bl ptr">14</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d15" dojoAttachEvent="onClick:setDay" class="ptr">15</td><td data-dojo-attach-point="d16" dojoAttachEvent="onClick:setDay" class="bl ptr">16</td><td data-dojo-attach-point="d17" dojoAttachEvent="onClick:setDay" class="bl ptr">17</td><td data-dojo-attach-point="d18" dojoAttachEvent="onClick:setDay" class="bl ptr">18</td><td data-dojo-attach-point="d19" dojoAttachEvent="onClick:setDay" class="bl ptr">19</td><td data-dojo-attach-point="d20" dojoAttachEvent="onClick:setDay" class="bl ptr">20</td><td data-dojo-attach-point="d21" dojoAttachEvent="onClick:setDay" class="bl ptr">21</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d22" dojoAttachEvent="onClick:setDay" class="ptr">22</td><td data-dojo-attach-point="d23" dojoAttachEvent="onClick:setDay" class="bl ptr">23</td><td data-dojo-attach-point="d24" dojoAttachEvent="onClick:setDay" class="bl ptr">24</td><td data-dojo-attach-point="d25" dojoAttachEvent="onClick:setDay" class="bl ptr">25</td><td data-dojo-attach-point="d26" dojoAttachEvent="onClick:setDay" class="bl ptr">26</td><td data-dojo-attach-point="d27" dojoAttachEvent="onClick:setDay" class="bl ptr">27</td><td data-dojo-attach-point="d28" dojoAttachEvent="onClick:setDay" class="bl ptr">28</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d29" dojoAttachEvent="onClick:setDay" class="ptr">29</td><td data-dojo-attach-point="d30" dojoAttachEvent="onClick:setDay" class="bl ptr">30</td><td data-dojo-attach-point="d31" dojoAttachEvent="onClick:setDay" class="bl ptr">31</td><td data-dojo-attach-point="d32" dojoAttachEvent="onClick:setDay" class="bl ptr">32</td><td data-dojo-attach-point="d33" dojoAttachEvent="onClick:setDay" class="bl ptr">33</td><td data-dojo-attach-point="d34" dojoAttachEvent="onClick:setDay" class="bl ptr">34</td><td data-dojo-attach-point="d35" dojoAttachEvent="onClick:setDay" class="bl ptr">35</td></tr>' +
+                                            '<tr><td data-dojo-attach-point="d36" dojoAttachEvent="onClick:setDay" class="ptr">36</td><td data-dojo-attach-point="d37" dojoAttachEvent="onClick:setDay" class="bl ptr">37</td><td data-dojo-attach-point="d38" dojoAttachEvent="onClick:setDay" class="bl ptr">38</td><td data-dojo-attach-point="d39" dojoAttachEvent="onClick:setDay" class="bl ptr">39</td><td data-dojo-attach-point="d40" dojoAttachEvent="onClick:setDay" class="bl ptr">40</td><td data-dojo-attach-point="d41" dojoAttachEvent="onClick:setDay" class="bl ptr">41</td><td data-dojo-attach-point="d42" dojoAttachEvent="onClick:setDay" class="bl ptr">42</td></tr>' +
+                                        '</table>' +
+                                    '</div>' +
+                                '</div>' +
                                 'скорость' +
                                 '<span title="Скорость анимации в секундах" style="position:relative; border-radius:5px; border:1px solid black; padding:0px 5px 1px 5px; margin-left:10px; margin-right:10px; background:white; cursor: pointer;" alt="Скорость анимации в секундах">' +
                                     '<span data-dojo-attach-point="dSpeed" style="width:30px; display:inline-block; font-size:14px;" dojoAttachEvent="onClick:showMenuS">1</span>' +                                        
@@ -78,10 +122,10 @@ function initTimeSlider(objSet) {
                                             '<span dojoAttachEvent="onClick:setSpeed" class="selectOption">10</span>' +
                                             '<span dojoAttachEvent="onClick:setSpeed" class="selectOption">30</span>' +
                                         '</div>' +
-                                '</span>' +                        
+                                    '</span>' +
                                 'дата:' + 
                                 '<input data-dojo-attach-point="selDate" type="text" class="tbwc" style="border-radius:5px; border:1px solid black; padding:2px 5px; width:107px; margin-left:10px; margin-right:10px;" value="____-__-__ __:__"' +                                           
-                                    'data-dojo-attach-event="onkeypress:Edok"/>' +                                    
+                                    'data-dojo-attach-event="onkeypress:Edok, onclick:showCalendarI"/>' +                                    
                                 'интервал' +
                                 '<span title="Время между сроками" style="position:relative; border-radius:5px; border:1px solid black; padding:0px 5px 1px 5px; height:16px; margin-left:10px; margin-right:10px; background:white; cursor: pointer;" alt="Скорость анимации в секундах">' +
                                     '<span data-dojo-attach-point="dInt" style="width:60px; display:inline-block; font-size:14px;" dojoAttachEvent="onClick:showMenuI">1 час</span>' +
@@ -189,6 +233,7 @@ function initTimeSlider(objSet) {
                 e.currentTarget.selectionStart = krok + 1;
                 e.currentTarget.selectionEnd = krok + 1;
                 dojo.stopEvent(e);
+                this.UpdateCalendarNE();
                 return;
             } else {
                 alert(key);
@@ -217,6 +262,10 @@ function initTimeSlider(objSet) {
         init: function () {
             this.startTime = new Date().getTime();
             var ttime = new Date(this.startTime);
+
+            this.inpval = ttime.getUTCFullYear() + ("0" + (ttime.getUTCMonth() + 1)).slice(-2) + ("0" + ttime.getUTCDate()).slice(-2) + ("0" + ttime.getUTCHours()).slice(-2);
+            this.selDate.value = this.inpval.substr(0, 4) + "-" + this.inpval.substr(4, 2) + "-" + this.inpval.substr(6, 2) + " " + this.inpval.substr(8, 2) + ":00";
+
             this.labels = [];
 
             for (var i = -24; i <= 24; i++) {
@@ -238,9 +287,22 @@ function initTimeSlider(objSet) {
                 this.labels.push(nruleLabel);
             }
 
-            this.inpval = ttime.getUTCFullYear() + ("0" + (ttime.getUTCMonth() + 1)).slice(-2) + ("0" + ttime.getUTCDate()).slice(-2) + ("0" + ttime.getUTCHours()).slice(-2);
-            this.selDate.value = this.inpval.substr(0, 4) + "-" + this.inpval.substr(4, 2) + "-" + this.inpval.substr(6, 2) + " " + this.inpval.substr(8, 2) + ":00";
             //if (this.onchange != undefined) this.onchange();
+            //'<span dojoAttachEvent="onClick:setMonth" class="selectOption">Янв</span>' +
+            papa = { value: this };
+            for (var i = 0; i < 12; i++) {
+                var t = document.createElement("span");
+                t.className = "selectOption";
+                t.innerHTML = (2015 - i).toString();
+                t.onclick = function (evt) {
+                    papa.value.dYear.innerHTML = evt.target.innerHTML;
+                    papa.value.dYearS.style.display = 'none';
+                    papa.value.inpval = evt.target.innerHTML + papa.value.inpval.substr(4);
+                    papa.value.UpdateCalendar();
+                };
+                this.dYearS.appendChild(t);
+            }
+            this.UpdateCalendarNE();
         },
         reinit: function (smeh) {
             this.curSmeh = (this.curSmeh + (smeh % 2)) % 2;            
@@ -264,7 +326,35 @@ function initTimeSlider(objSet) {
                 //this.inpval = this.selDate;
                 this.reinit(0);
             }
-            
+            /*
+            // Calendar
+            var stt = new Date(this.startTime);
+            var curYear = stt.getUTCFullYear();
+            var curMont = stt.getUTCMonth();
+            function daysInMonth(month,year) {
+                return new Date(year, month, 0).getDate();
+            }
+
+            var cd = daysInMonth(curMont, curYear, 0);
+            var dw = stt.getDay();
+            if (dw == 0) dw = 6; else dw--;
+
+            for (var i = 1; i < 36; i++) this["d" + ("0" + i.toString()).slice(-2)].innerHTML = "";
+            for (var i = 0; i < cd; i++)  this["d" + ("0" + (i + dw).toString()).slice(-2)].innerHTML = (i + 1).toString();
+
+            //'<span dojoAttachEvent="onClick:setMonth" class="selectOption">Янв</span>' +
+            papa = { value: this };
+            for (var i = 0; i < 12; i++) {
+                var t = document.createElement("span");
+                t.className = "selectOption";
+                t.innerHTML = (curYear - i).toString();
+                t.onclick = function (evt) {
+                    papa.value.dYear.innerHTML = evt.target.innerHTML;
+                    papa.value.dYearS.style.display = 'none';
+                };                
+                this.dYearS.appendChild(t);
+            }
+            */
         },
         move: false,
         sp: -1,
@@ -356,6 +446,133 @@ function initTimeSlider(objSet) {
         },
         stopdrag: function (evt) {
             stopdrag();
+        },
+        // Calendar
+        setMonth: function (evt) {
+            var Reind = { "Янв" : "01", "Фев" : "02", "Мар" : "03", "Апр" : "04", "Май" : "05", "Июн" : "06", "Июл" : "07", "Авг" : "08", "Сен" : "09", "Окт" : "10", "Ноя" : "11", "Дек" : "12"};
+            this.dMonth.innerHTML = evt.target.innerHTML;
+            this.dMonthS.style.display = 'none';
+            this.inpval = this.inpval.substr(0, 4) + Reind[evt.target.innerHTML] + this.inpval.substr(6);
+            this.UpdateCalendar()
+        },
+        showMonthS: function (evt) { this.dMonthS.style.display = 'block'; },
+        hideMonthS: function (evt) { this.dMonthS.style.display = ''; },        
+        showYearS: function (evt) { this.dYearS.style.display = 'block'; },
+        hideYearS: function (evt) { this.dYearS.style.display = ''; },
+        setDay: function (evt) {
+            if (evt.target.innerHTML === " ") return;            
+            this.inpval = this.inpval.substr(0, 6) + ("0" + evt.target.innerHTML).slice(-2) + this.inpval.substr(8);
+            this.UpdateCalendar()
+            //this.dCalendar.style.display = 'none';
+            this.Update();
+        },
+        showCalendarI: function (evt) {
+            this.dCalendar.style.display = 'block';
+        },
+        hideCalendarI: function (evt) {
+            function isHover(e) { return (e.parentElement.querySelector(':hover') === e); }            
+            if (!isHover(this.domNode)) { this.dCalendar.style.display = 'none'; }
+        },
+        minusMonth: function (evt) {            
+            var mdk = new Date(this.inpval.substr(0, 4), this.inpval.substr(4, 2) -1, 5);
+            mdk.setMonth(mdk.getMonth() - 1);
+            this.inpval = mdk.getFullYear() + ("0" + (mdk.getMonth() + 1)).slice(-2) + this.inpval.substr(6);
+            this.UpdateCalendar();
+        },
+        plusMonth: function (evt) {
+            var mdk = new Date(this.inpval.substr(0, 4), this.inpval.substr(4, 2) - 1, 5);
+            mdk.setMonth(mdk.getMonth() + 1);
+            this.inpval = mdk.getFullYear() + ("0" + (mdk.getMonth() + 1)).slice(-2) + this.inpval.substr(6);
+            this.UpdateCalendar();
+        },
+        UpdateCalendar: function (evt) {
+            this.selDate.value = this.inpval.substr(0, 4) + "-" + this.inpval.substr(4, 2) + "-" + this.inpval.substr(6, 2) + " " + this.inpval.substr(8, 2) + ":00";
+            var yearFInp = this.inpval.substr(0, 4);
+            var monthFInp = this.inpval.substr(4, 2);
+            var dayFInp = this.inpval.substr(6, 2);
+            //Set Year
+            if (yearFInp.indexOf('_') < 0) {
+                this.dYear.innerHTML = yearFInp;
+            } else {
+                return;
+            }
+            //Set Month
+            if (monthFInp.indexOf('_') < 0) {
+                var Reind = [ "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+                this.dMonth.innerHTML = Reind[+monthFInp-1];
+                //RecalcDays
+                function daysInMonth(month, year) {
+                    return new Date(year, month, 0).getDate();
+                }
+                var stt = new Date(Date.UTC(+yearFInp, (+monthFInp - 1), 1, 0, 0, 0, 0));
+                var cd = daysInMonth(+monthFInp, +yearFInp);
+                var dw = stt.getDay();
+                if (dw == 0) dw = 6; else dw--;
+
+                for (var i = 1; i < 43; i++) this["d" + ("0" + i.toString()).slice(-2)].innerHTML = " ";
+                for (var i = 1; i <= cd; i++) this["d" + ("0" + (i + dw).toString()).slice(-2)].innerHTML = (i).toString();
+            } else {
+                return;
+            }
+            //SetCurentDay
+            if (dayFInp.indexOf('_') < 0) {
+                for (var i = 1; i < 43; i++) this["d" + ("0" + i.toString()).slice(-2)].style.backgroundColor = "white";
+                var stt = new Date(Date.UTC(+yearFInp, (+monthFInp - 1), 1, 0, 0, 0, 0));
+                var cd = daysInMonth(+monthFInp, +yearFInp);
+                var dw = stt.getDay();
+                if (dw == 0) dw = 6; else dw--;
+                if (+dayFInp > cd) {
+                    this.inpval = this.inpval.substr(0, 6) + cd.toString() + this.inpval.substr(8);
+                    this.selDate.value = this.inpval.substr(0, 4) + "-" + this.inpval.substr(4, 2) + "-" + this.inpval.substr(6, 2) + " " + this.inpval.substr(8, 2) + ":00";
+                    this["d" + ("0" + (cd + dw).toString()).slice(-2)].style.backgroundColor = "gray";
+                } else {
+                    this["d" + ("0" + (+dayFInp + dw).toString()).slice(-2)].style.backgroundColor = "gray";
+                }
+            }
+
+            // Calendar
+        },
+        UpdateCalendarNE: function (evt) {        
+            var yearFInp = this.inpval.substr(0, 4);
+            var monthFInp = this.inpval.substr(4, 2);
+            var dayFInp = this.inpval.substr(6, 2);
+                //Set Year
+            if (yearFInp.indexOf('_') < 0) {
+                this.dYear.innerHTML = yearFInp;
+            } else {
+                return;
+            }
+            //Set Month
+            if (monthFInp.indexOf('_') < 0) {
+                var Reind = [ "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+                this.dMonth.innerHTML = Reind[+monthFInp-1];
+                //RecalcDays
+                function daysInMonth(month, year) {
+                    return new Date(year, month, 0).getDate();
+                }
+                var stt = new Date(Date.UTC(+yearFInp, (+monthFInp - 1), 1, 0, 0, 0, 0));
+
+                var cd = daysInMonth(+monthFInp, +yearFInp);
+                var dw = stt.getDay();
+                if (dw == 0) dw = 6; else dw--;
+
+                for (var i = 1; i < 43; i++) this["d" + ("0" + i.toString()).slice(-2)].innerHTML = "";
+                for (var i = 1; i <= cd; i++) this["d" + ("0" + (i + dw).toString()).slice(-2)].innerHTML = (i).toString();                
+            } else {
+                return;
+            }
+            //SetCurentDay
+            if (dayFInp.indexOf('_') < 0) {
+                for (var i = 1; i < 43; i++) this["d" + ("0" + i.toString()).slice(-2)].style.backgroundColor = "white";
+                var stt = new Date(Date.UTC(+yearFInp, (+monthFInp - 1), 1, 0, 0, 0, 0));
+                var cd = daysInMonth(+monthFInp, +yearFInp);
+                var dw = stt.getDay();
+                if (dw == 0) dw = 6; else dw--;
+                if (+dayFInp <= cd) {
+                    this["d" + ("0" + (+dayFInp + dw).toString()).slice(-2)].style.backgroundColor = "gray";
+                }
+            }
+                // Calendar
         }
     });
     timeSlider = new fesrcplaneta.timeSlider();

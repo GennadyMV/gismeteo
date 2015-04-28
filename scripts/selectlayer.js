@@ -79,7 +79,10 @@ function (dom, on) {
     on(dom.byId("cbPRMSLField"), "change", CheckCheck);
     on(dom.byId("cbGRIBWind"), "change", CheckCheck);
     on(dom.byId("cbAPCPField"), "change", CheckCheck);
+    on(dom.byId("cbTCDCField"), "change", CheckCheck);
     on(dom.byId("cbGRIBWindF"), "change", CheckCheck);
+    // Pred
+    on(dom.byId("cbFloodPred"), "change", CheckCheck);
 
     function CheckCheck(event) {        
         switch (event.target.id)
@@ -213,7 +216,11 @@ function (dom, on) {
                 if (dojo.byId('cbAscat').checked) map.getLayer("Ascat").show(); else map.getLayer("Ascat").hide();
                 break;
             case "cbHGTIsoline":
-                if (dojo.byId('cbHGTIsoline').checked)  map.getLayer("GRIB_HGT_ISO").show(); else map.getLayer("GRIB_HGT_ISO").hide();
+                if (dojo.byId('cbHGTIsoline').checked) map.getLayer("GRIB_HGT_ISO").show(); else map.getLayer("GRIB_HGT_ISO").hide();
+                break;
+            case "cbFloodPred":
+                ShowHideWindow('predictWindow');
+                if (dojo.byId('cbFloodPred').checked) map.getLayer("PredictFlood").show(); else map.getLayer("PredictFlood").hide();
                 break;
             case "cbHGTField":
                 if (dojo.byId('cbHGTField').checked) map.getLayer("GRIB_HGT_FIELD").show(); else map.getLayer("GRIB_HGT_FIELD").hide();
@@ -238,7 +245,10 @@ function (dom, on) {
                 break;
             case "cbAPCPField":
                 if (dojo.byId('cbAPCPField').checked) map.getLayer("GRIB_APCP_FIELD").show(); else map.getLayer("GRIB_APCP_FIELD").hide();
-                break;                
+                break;
+            case "cbTCDCField":
+                if (dojo.byId('cbTCDCField').checked) map.getLayer("GRIB_TCDC_FIELD").show(); else map.getLayer("GRIB_TCDC_FIELD").hide();
+                break;
             case "cbGRIBWind":
                 if (dojo.byId('cbGRIBWind').checked) map.getLayer("GRIB_WIND_BARBS").show(); else map.getLayer("GRIB_WIND_BARBS").hide();
                 break;

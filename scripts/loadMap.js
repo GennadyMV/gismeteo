@@ -6,6 +6,25 @@
 // Глобальные переменные
 var map;
 var timeSlider;
+var printer;
+dojo.require("esri.tasks.PrintTemplate");
+function printMapMF() {
+    dojo.byId("printicon").src = "images/icons/printing.gif";
+    //<!--<li><img src="images/print_printer.png" title="Печать"            class="ToolbarToggleButton" onclick="printMapMF();"/></li>-->
+    //            <li><img id="printicon" src="images/icons/printing.gif" title="Печать"            class="ToolbarToggleButton" onclick="printMapMF();"/></li>
+    var Template = new esri.tasks.PrintTemplate();
+    Template.layout = "A4 Landscape";
+    var stT = new Date(timeSlider.startTime);    
+    var dde = stT.getUTCFullYear() + "-" + ("0" + (stT.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + stT.getUTCDate()).slice(-2) + " " + ("0" + stT.getUTCHours()).slice(-2) + ":00:00";
+    Template.layoutOptions = {
+        titleText: "Специализированная информация геоинформационого портала \"МЕТЕО-ДВ\"",
+        customTextElements: [
+            { "mydate": "Данные за " + dde }
+        ]
+    };
+
+    printer.printMap(Template);
+}
 function initMap() {
     // Инициализация картоосновы
     map = new esri.Map("map", {
@@ -67,12 +86,23 @@ function initMap() {
         map.disableMapNavigation();
         //map.hideZoomSlider();
     }
-
     function hideLoading(error) {
         esri.hide(dojo.byId("loadingImg"));
         map.enableMapNavigation();
         //map.showZoomSlider();
     }
+    printer = new esri.dijit.Print({
+        map: map,
+        url: "http://10.8.6.6/arcgis/rest/services/geoproc/ExportWebMap/GPServer/Export%20Web%20Map"
+    }, dojo.byId("printButton"));
+
+    printer.on('print-complete', function (evt) {
+        dojo.byId("printicon").src = "images/print_printer.png";
+        dojo.byId("divPrint").style.display = "block";
+        dojo.byId("aPrint").href = evt.result.url;
+    });
+
+    printer.startup();
 };
 
 function initSlider() {

@@ -115,6 +115,7 @@ function SetLayers() {
     for (var i = 0; i < cBoxes.length; i++) {
         dojo.byId(cBoxes[i]).disabled = true;
     }
+  //  dojo.byId('cbFloodPred').disabled = false;
     //Add attribData
     var lBorders = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/borders/MapServer", { id: "Bounds", visible: false }); cntLayers++;
     var lRestrict = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/restrict/MapServer", { id: "Restrict", visible: false }); cntLayers++;
@@ -130,6 +131,7 @@ function SetLayers() {
     var resurs = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_resursp/ImageServer", { id: "RESURSP_Raster", visible: false }); cntLayers++;
     var kanopus = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_kanopus/ImageServer", { id: "KANOPUS_Raster", visible: false }); cntLayers++;
     var floods = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/floods_clouds/floods_clouds/MapServer", { id: "Flood", visible: false }); cntLayers++;
+
     var snow_map = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/snow/snow_map_t/MapServer", { id: "SnowMap", visible: false }); cntLayers++;
     var snow_line = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/snow/snow_line_5_t/MapServer", { id: "SnowBorders", visible: false }); cntLayers++;
 
@@ -141,13 +143,17 @@ function SetLayers() {
    // var cloudsAfter180 = new dcrscplaneta.WMSLayer({ url: ip_serv + "geoserver/dvrcpod/wms", after180: true, layer: "dvrcpod:clouds", id: "cloudsAfter180", visible: false }); cntLayers++;
 
     //ASCAT
-    var Ascat = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/ascat_soil_t/MapServer", { id: "Ascat", visible: false }); cntLayers++;
+    //var Ascat = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/ascat_soil_t/MapServer", { id: "Ascat", visible: false }); cntLayers++;
+    var Ascat = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/rasters/ascat_soil/ImageServer", { id: "Ascat", visible: false }); cntLayers++;
+    Ascat.setLevel();
+    Ascat.setInterpolation("INTERPOLATION_CUBICCONVOLUTION");
 
-    // Borsch
-    var borsh = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/forecast/borsch_vdnh_inf/MapServer", { id: "ZeyaVDHR", visible: false }); cntLayers++;
-    var borsh2 = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/forecast/borsch_level/MapServer", { id: "LevelPred", visible: false }); cntLayers++;
-    
     if (token != "") {
+        //predict
+        
+        var predictfloods = new dcrscplaneta.MapJob({url:ip_serv + "arcgis/rest/services/geoproc/FloodPrediction/MapServer",  id: "PredictFlood", visible: false }); cntLayers++;
+        predictfloods.token = token;
+
         //Add Hydro
         var hydro = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/stations/hydro/MapServer/?token=" + token, { id: "Hydro", visible: false }); cntLayers++;
         var snow = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/stations/snow/MapServer/?token=" + token, { id: "Snow", visible: false }); cntLayers++;
@@ -179,6 +185,9 @@ function SetLayers() {
         // Add APCP
         var apcpfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_apcp_field_2/ImageServer/?token=" + token, { id: "GRIB_APCP_FIELD", visible: false }); cntLayers++;        
         apcpfld.setLevel();
+        // Add APCP
+        var tcdcfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_tcdc_field/ImageServer/?token=" + token, { id: "GRIB_TCDC_FIELD", visible: false }); cntLayers++;
+        tcdcfld.setLevel();
         //Add PRMSL
         var prmsliso = new dcrscplaneta.clsChangeItemDMSL(ip_serv + "arcgis/rest/services/forecast/wrf_prmsl_iso_2/MapServer/?token=" + token, { id: "GRIB_PRMSL_ISO", visible: false }); cntLayers++;
         prmsliso.leg_name = "Давление";
@@ -187,24 +196,27 @@ function SetLayers() {
         prmslfld.setLevel();
         //Add WIND        
         var windwrf = new dcrscplaneta.WSDGLayer();
-        windwrf.url = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer";
+        windwrf.url = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/?token=" + token;
         windwrf.id = "GRIB_WIND_BARBS";
         windwrf.visible = false;
-        windwrf.nUrl = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/exportImage";
+        windwrf.nUrl = ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/exportImage?token=" + token + "&";
         cntLayers++;
         var windfld = new dcrscplaneta.clsChangeItemDMSLField(ip_serv + "arcgis/rest/services/forecast/wrf_wind_field/ImageServer/?token=" + token, { id: "GRIB_WIND_FIELD", visible: false }); cntLayers++;        
         windfld.setLevel("500");
 
+        // Borsch
+        var borsh = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/forecast/borsch_vdnh_inf/MapServer/?token=" + token, { id: "ZeyaVDHR", visible: false }); cntLayers++;
+        var borsh2 = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/forecast/borsch_level/MapServer/?token=" + token, { id: "LevelPred", visible: false }); cntLayers++;
+
         map.addLayers([modis, meteor, landsat, resurs, kanopus,
-                        floods, snow_map, snow_line, clouds, Ascat,
-                        hgtfld, tmpfld, rhfld, apcpfld, prmslfld, windfld,
+                        floods, predictfloods, snow_map, snow_line, clouds, Ascat,
+                        hgtfld, tmpfld, rhfld, tcdcfld, apcpfld, prmslfld, windfld,
                         hydro, snow, snow24, meteo,
                         borsh, borsh2, hgtiso, tmpiso, rhiso, prmsliso, windwrf,
                         lBorders, lRestrict, lCity, lRivers, lRoads, lShoreline]);
     } else {
         map.addLayers([modis, meteor, landsat, resurs, kanopus,
                         floods, snow_map, snow_line, clouds, Ascat,
-                        borsh, borsh2,
                         lBorders, lRestrict, lCity, lRivers, lRoads, lShoreline]);
     }
 }

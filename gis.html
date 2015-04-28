@@ -1,0 +1,645 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+
+    <title>Метео-ДВ</title>      
+    <link rel="Shortcut Icon" type="image/x-icon" href="images/sat.ico" /> 
+    
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+  
+    
+      
+            
+      <link rel="stylesheet" type="text/css" href="esri/3.12/dijit/themes/tundra/tundra.css"/>
+         <link rel="stylesheet" type="text/css" href="esri/3.12/esri/css/esri.css" />
+         <script type="application/javascript" src="esri/3.12/init.js"></script> 
+    
+      <!-- 
+    
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/dijit/themes/tundra/tundra.css"/>
+    <link rel="stylesheet" type="text/css" href="http://10.8.6.5/scripts/3.12/esri/css/esri.css" />
+    <script type="application/javascript" src="http://10.8.6.5/scripts/3.12/init.js"></script> 
+
+-->
+<!--
+        <link rel="stylesheet" href="http://js.arcgis.com/3.13/dijit/themes/claro/claro.css">
+        <link rel="stylesheet" href="http://js.arcgis.com/3.13/esri/css/esri.css">
+        <script type="text/javascript" src="http://js.arcgis.com/3.13/"></script>
+      -->
+
+
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/legend.css">
+
+    <script type="application/javascript" src="scripts/globe.js"></script>
+
+    <!--
+        Include scripts
+    -->    
+    
+    <script type="application/javascript" src="scripts/loadMap.js"></script>
+    <script type="application/javascript" src="scripts/viewMap.js"></script>
+    <script type="application/javascript" src="scripts/legend.js"></script>    
+    <script type="application/javascript" src="scripts/DatesSelector.js"></script>
+    <script type="application/javascript" src="scripts/dcrscplanetaclass.js"></script>
+    <script type="application/javascript" src="scripts/search.js"></script>    
+    <script type="application/javascript" src="scripts/floodpred.js"></script>
+    <script type="application/javascript" src="scripts/FastCalendar.js"></script>
+    <script type="application/javascript" src="scripts/clsInfo.js"></script>
+    <script type="application/javascript" src="scripts/hpsel.js"></script>
+    <script type="application/javascript" src="scripts/countours/d3.js"></script>
+    <script type="application/javascript" src="scripts/countours/conrec.js"></script>
+      <script type="application/javascript" src="scripts/clstimeslider.js"></script>
+    <!--
+        Load map
+    -->
+    <script>
+
+        dojo.ready(function () {
+            initInfo();            
+            initDatesSelector();
+            initAddClasses();
+            initMap();
+            initAddClass();
+            initPredictTable();
+        });
+
+        //после загрузки всего документа запускается следующий код
+        /*
+        window.onload = function () {
+
+            dojo.on(dojo.dom.byId("btnRefTime"), "click", refreshSlider);
+            dojo.on(dojo.dom.byId("intervals"), "change", refreshSlider);
+        };
+        */
+    </script>
+    <!--
+        Check Boxes
+    -->
+    <script type="application/javascript" src="scripts/selectlayer.js"></script>  
+    <!--
+        Show\Hide DIV
+    -->     
+    <script>
+        function ShowHideWindow(Div) {
+            if (dojo.style(dojo.byId(Div), "display") == "none") {
+                dojo.style(dojo.byId(Div), "display", "block");
+                dojo.fadeIn({ node: dojo.byId(Div) }).play();
+            } else {
+                dojo.style(dojo.byId(Div), "display", "none");
+                dojo.fadeIn({ node: dojo.byId(Div) }).play();
+            }
+            if (dojo.style(dojo.byId("loginWindow"), "display") == "none" && dojo.style(dojo.byId("AdditionalDiv"), "display") == "none") {
+                dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar", "OptionToolbar2");
+            } else {
+                dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar2", "OptionToolbar");
+            }
+            if (dojo.style(dojo.byId("predictWindow"), "display") == "none") {
+                dojo.byId("cbFloodPred").checked = false;
+            } 
+        }
+    </script>
+    <!--
+        Change Name/image DIV
+    -->     
+    <script>
+        function ChangeName() {
+            if (token != "") {
+                dojo.byId('lockIcon').className = "ToolbarToggleButton UnlockImage";
+                dojo.byId('tlogin').disabled = true;
+                dojo.byId('tpass').disabled = true;
+                dojo.byId('inputOutput').value = "Выйти";
+            } else {
+                dojo.byId('lockIcon').className = "ToolbarToggleButton lockImage";
+                dojo.byId('inputOutput').value = "Войти";
+                dojo.byId('tlogin').disabled = false;
+                dojo.byId('tpass').disabled = false;
+                dojo.byId('tpass').value = '';
+            }
+        }
+    </script>
+    <!--
+        Move TimeSlider
+    -->    
+    <script>
+        var dragapproved = false
+        var sCur
+        var ie5 = document.all && document.getElementById
+        var ns6 = document.getElementById && !document.all
+
+        function drag_dropRB(e) {
+            if (ie5 && dragapproved && event.button == 1) {
+                document.getElementById(sCur).style.right = tempx - (event.clientX - offsetx) + "px"
+                document.getElementById(sCur).style.bottom = tempy - (event.clientY - offsety) + "px"
+            }
+            else if (ns6 && dragapproved) {
+                document.getElementById(sCur).style.right = tempx - (e.clientX - offsetx) + "px"
+                document.getElementById(sCur).style.bottom = tempy - (e.clientY - offsety) + "px"
+            }
+        }
+
+        function initializedragRB(e, cur) {
+            sCur = cur
+            offsetx = ie5 ? event.clientX : e.clientX
+            offsety = ie5 ? event.clientY : e.clientY
+            tempx = parseInt(document.getElementById(cur).style.right)
+            tempy = parseInt(document.getElementById(cur).style.bottom)
+
+            dragapproved = true
+            document.onmousemove = drag_dropRB
+        }
+
+        function stopdrag() {
+            dragapproved = false;
+            document.getElementById(sCur).onmousemove = null;
+        }
+
+    </script>
+      
+
+    <!-- 
+        TabBar Control
+    -->
+
+    <style>
+        #tabs {
+            position:absolute;
+            padding: 0px; 
+            margin:0px 4px 4px 4px; 
+            clear: both; 
+            width: 247px;
+            height:auto;
+            bottom:0px;
+            top: 24px;             
+            border-top:    0px solid #000;
+            border-right:  1px solid #000;
+            border-bottom: 1px solid #000;
+            border-left:   1px solid #000;
+            border-bottom-right-radius:5px;
+            border-bottom-left-radius:5px;
+        }
+        #tabs-title { 
+            padding: 0px; 
+            margin:4px 4px 0px 4px; 
+            clear: both; 
+            width: 249px; 
+            border: 0px solid #000;
+            text-align: center;
+            background-color:transparent;
+            height: 20px;
+        }
+        .tab-title {
+            background-color:transparent;
+            width:81px; 
+            cursor: pointer; 
+            margin: 0px; 
+            padding: 0px; 
+            list-style: none; 
+            float: left; 
+            border-top:    1px solid #000;
+            border-right:  1px solid #000;
+            border-bottom: 1px solid #000;
+            border-left:   1px solid #000;
+            border-top-right-radius:5px;
+            border-top-left-radius:5px;
+        }
+        .selected-li{
+            border-bottom: 0px solid #CCC;
+        }
+        #tabs-title li:hover {
+            text-decoration: underline;
+        }
+        .tab { 
+            padding: 10px; 
+            display: none; 
+            background-color:transparent; 
+            text-align: justify;
+        }
+        .selected { display: block; }
+        ul.ulSettings {
+            margin-top: 0px;
+            margin-left: 0px;
+            padding: 0;
+            list-style: none;
+        }
+        ul.ulSettings li {
+            margin-bottom: 5px;
+        }
+        ul.ulSettings li ul {
+            margin-top: 0px;
+            margin-left: 10px;
+            padding: 0;
+            list-style: none;
+        }
+
+    </style>  
+    <script type="text/javascript">
+        var tabCount = 3;
+        function SelectTab(idx) {
+            for (var i = 1; i <= tabCount; ++i) {
+                var _tab = document.getElementById("tab" + i);
+                var _tabTitle = document.getElementById("tab-title" + i);
+                if (idx != i) {
+                    _tab.setAttribute("class", "tab");
+                    _tabTitle.setAttribute("class", "tab-title");
+                }
+                else {
+                    _tab.setAttribute("class", "tab selected");
+                    _tabTitle.setAttribute("class", "tab-title selected-li");
+                }
+            }
+        }
+
+        function TWSelUnSel(Papa, Group) {            
+            var elG = document.getElementById(Group);
+            var elP = document.getElementById(Papa);
+            if ( elG.classList.contains("selected"))
+            {
+                elG.setAttribute("class", "tree-view");
+                elP.setAttribute("class", "arr");
+            }
+            else
+            {
+                elG.setAttribute("class", "selected");
+                elP.setAttribute("class", "ard");
+            }
+        }
+    </script> 
+
+
+      <!-- 
+        Model close window
+    -->
+    <script type="text/javascript">
+        function ShowMessage(message) {
+
+            var maskHeight = document.body.clientHeight;
+            var maskWidth = document.body.clientWidth;
+
+            dojo.style(dojo.byId("mask"), "width", maskWidth + "px");
+            dojo.style(dojo.byId("mask"), "height", maskHeight + "px");
+            dojo.style(dojo.byId("mask"), "opacity", "0.8");
+            dojo.style(dojo.byId("dialog"), "left", maskWidth/2 - 300 / 2 + "px");
+            dojo.style(dojo.byId("dialog"), "top", maskHeight / 2 - 150 / 2 + "px");
+            dojo.style(dojo.byId("dialog"), "display", "block");
+            dojo.byId("dialog").innerHTML = message +
+            "<div style=\"text-align: center;margin:15px;\"><input type=\"button\" id=\"closeMes\" value=\"Закрыть окно\" onclick=\"CloseMessage('dialog')\" / ></div>";
+        }
+
+        function CloseMessage(Div) {
+            dojo.style(dojo.byId(Div), "display", "none");
+//            dojo.fadeIn({ node: dojo.byId(Div) }).play();
+            dojo.style(dojo.byId("mask"), "width", "0px");
+            dojo.style(dojo.byId("mask"), "height", "0px");
+            dojo.style(dojo.byId("mask"), "opacity", "0");
+        }
+    </script> 
+  
+    <!--
+        GetSend Token
+    -->
+    <script type="text/javascript">
+        var token = "";
+
+        function GetToken() {
+            if (dojo.byId('inputOutput').value == "Войти") {
+                esri.show(dojo.byId("loadingImg"));
+                var a = document.getElementById("tlogin").value; // Считываем значение a
+                var b = document.getElementById("tpass").value; // Считываем значение b
+                var xmlhttp = getXmlHttp(); // Создаём объект XMLHTTP
+                //url
+
+                xmlhttp.open('POST', ip_serv + "arcgis/tokens/generateToken", true); // Открываем асинхронное соединение
+
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // Отправляем кодировку
+                xmlhttp.send("request=getToken&username=" + encodeURIComponent(a) + "&password=" + encodeURIComponent(b) + "&expiration=1440&client=requestip"); // Отправляем POST-запрос
+                xmlhttp.onreadystatechange = function () { // Ждём ответа от сервера
+                    if (xmlhttp.readyState == 4) { // Ответ пришёл
+                        if (xmlhttp.status == 200) { // Сервер вернул код 200 (что хорошо)
+                            //document.getElementById("summa").innerHTML = xmlhttp.responseText; // Выводим ответ сервера
+                            //alert(xmlhttp.responseText);
+                            token = xmlhttp.responseText;
+                            var ty = token.indexOf('request');
+                            if (token.indexOf('Invalid request') + 1) {
+                                ShowMessage("Вы ввели неверный логин или пароль!!!");
+                                dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar2", "OptionToolbar");
+                                dojo.style(dojo.byId("loginWindow"), "display", "block");
+                            } else {
+                                dojo.style(dojo.byId("AboutImage"), "display", "block");
+                                SetLayers();
+                                ChangeName();
+                                //dojo.style(dojo.byId("mask"), "display", "none");
+                                //dojo.style(dojo.byId("mask"), "opacity", "1");
+                                //dojo.fadeOut({ node: dojo.byId("mask"), duration: 1000 }).play();
+                                ShowHideWindow('loginWindow');
+                            }
+                            esri.hide(dojo.byId("loadingImg"));
+                        } else {
+                            ShowMessage("Вы ввели неверный логин или пароль!");
+//                            alert("Вы ввели неверный логин или пароль!!!");
+                            dojo.replaceClass(dojo.byId("OptionToolba"), "OptionToolbar2", "OptionToolbar");
+                            dojo.style(dojo.byId("loginWindow"), "display", "block");
+                            esri.hide(dojo.byId("loadingImg"));
+//                            ChangeName();
+                        }
+                    }
+                };
+            } else {
+                esri.show(dojo.byId("loadingImg"));
+                token = "";
+                SetLayers();
+                ChangeName();
+                esri.hide(dojo.byId("loadingImg"));
+            }
+            
+        }
+
+        Date.prototype.AddHours = function (h) {
+            this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+            return this;
+        }
+        
+    </script>
+  </head>
+
+  <body>
+    <div id="map"
+            data-dojo-type="dijit/layout/ContentPane" 
+            data-dojo-props="region:'center'" 
+            style="overflow:hidden;">
+
+        <img src="images/i_tools.png" style="height:30px; width:30px; position:absolute; right:0px; top:0px; z-index:135" /> <!--onclick="ShowHideWindow('MainToolbar')"--> 
+        <div id="MainToolbar" class="CommonBorder BackgroundBorder">
+<!--            <img src="images/i_tools.png" style="height:30px; width:30px; margin:-5px; position:absolute; right:-5px;"/>           --> 
+            <ul class="ulMain">
+                <!--<li><img src="images/print_printer.png" title="Печать"            class="ToolbarToggleButton" onclick="printMapMF();"/></li>-->
+                <li><img id="printicon" src="images/print_printer.png" title="Печать"            class="ToolbarToggleButton" onclick="printMapMF();"/></li>
+                <li><img src="images/i_clock.png"       title="Временная шкала"   onclick="ShowHideWindow('timeWindow');" class="ToolbarToggleButton"/></li>
+                <li><img src="images/i_clickglobe.png"  title="Базовая карта"     class="ToolbarToggleButton"/>
+                    <ul>
+                        <li>
+                            <div id="basemapGalleryWindow" class="CommonBorder BackgroundBorder">
+                                <div id="basemapGalleryDiv" style="margin-left: 15px; margin-right: auto;"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li><img src="images/i_legend.png"      title="Легенда"           onclick="ShowHideWindow('legendWindow');"       class="ToolbarToggleButton"/></li>
+                <li><img src="images/i_overview.png"    title="Обзор карты"       onclick="ShowHideWindow('overviewMapWindow');"  class="ToolbarToggleButton"/></li>
+            </ul>            
+        </div>
+        <div id="divPrint" class="CommonBorder BackgroundBorder" style="position:absolute; top:50px; right:170px; width:80px; height:20px; display:none; z-index:90;">
+            <a id="aPrint" href="" target="_blank" onclick="ShowHideWindow('divPrint');">Загрузить</a>
+        </div>
+
+        <div id="OptionToolba" class="OptionToolbar CommonBorder BackgroundBorder">
+            <p style="margin-top:10px; margin-left:50px; font-size:14px;">МЕТЕО-ДВ</p>
+            <img style="position:absolute; top:0px; right:40px;" src="images/i_list.png" alt="Вкл/Выкл панель выбора имеющихся данных" class="ToolbarToggleButton" onclick="ShowHideWindow('AdditionalDiv');"/>
+            <div id="lockIcon" style="position:absolute; top:0px; right:5px;" class="ToolbarToggleButton lockImage" onclick="ShowHideWindow('loginWindow');"></div>
+        </div>
+        <img src="images/logo.png" style="position:absolute; z-index:130; width:57px; height:55px; left:0px; top:0px" /> <!--onclick="ShowHideWindow('OptionToolbar')"-->
+                
+        <div id="AdditionalDiv" class="CommonBorder BackgroundBorder">
+            <ul id="tabs-title">
+                <li id="tab-title1" onclick="SelectTab(1);" class="tab-title selected-li">Продукты</li>
+                <li id="tab-title2" onclick="SelectTab(2);" class="tab-title">Настройка</li>
+                <li id="tab-title3" onclick="SelectTab(3);" class="tab-title">Поиск</li>
+            </ul>
+            <div id="tabs">
+                <!-- Список продуктов и дат -->
+                <div class="tab selected" id="tab1" style="height:100%">
+                    <div id="divDates" class="ProductStyle"></div>
+                </div>
+                <!-- Настройки -->
+                <div class="tab ProductStyle" id="tab2">
+                    <ul class="ulSettings ProductStyle">
+                        <li><input type="checkbox" name="visLayers" id="cbBorders"/>Границы
+                            <ul>
+                                <li><input type="checkbox" name="visLayers" id="cbGosg"/>Государственные</li>
+                                <li><input type="checkbox" name="visLayers" id="cbAdm1"/>Адм. 1 порядка</li> 
+                                <li><input type="checkbox" name="visLayers" id="cbAdm2"/>Адм. 2 порядка</li>
+                            </ul>
+                        </li>
+                        <li><input type="checkbox" name="visLayers" id="cbRestricted"/>Охраняемые территории
+                            <ul>
+                                <li><input type="checkbox" name="visLayers" id="cbZP"/>Заповедники</li>
+                                <li><input type="checkbox" name="visLayers" id="cbNP"/>Национальные парки</li>
+                                <li><input type="checkbox" name="visLayers" id="cbFZ"/>Федеральные заказники</li>
+                            </ul>
+                        </li>
+                        <li><input type="checkbox" name="visLayers" id="cbCity"/>Города
+                            <ul>
+                                <li><input type="radio" name="grCity" id="cbChis" checked="checked"/>По числености</li>
+                                <li><input type="radio" name="grCity" id="cbStatus"/>По статусу</li>
+                            </ul>
+                        </li> 
+                        <li><input type="checkbox" name="visLayers" id="cbRivers"/>Гидрологические объекты</li>
+                        <li><input type="checkbox" name="visLayers" id="cbRoads"/>Авто- и жд- дороги</li>
+                        <li><input type="checkbox" name="visLayers" id="cbShoreline"/>Береговая линия</li>
+                    </ul>
+                </div>
+                <!-- Поиск -->
+                <div class="tab" id="tab3" style="height:100%">
+                    <div id="printButton" style="display:none;"></div>          
+                    <input type="text" id="address"/>
+                    <!--<div id="result" style="width:600px; height:300px; overflow-y:scroll;"></div>-->
+                    <input  class="SearchButton" type="button" onclick="executeQuerySearch(dojo.byId('address').value);" />
+                    <!--<img id="locate" src="images/icons/search.png" style="float:right; cursor:pointer"/>-->
+                        <!--<button class="myIcon" id="locate" data-dojo-type="dijit/form/Button">найти</button>--> 
+                    <div id="divSearchResult" style="width:auto; height:95%; overflow-y:auto;"></div>
+                </div>
+            </div>                       
+        </div>
+
+        <div id="SelProdToolbar" class="CommonBorder BackgroundBorder">
+            <ul class="menu" >
+            <!--<ul class="menu" >-->
+                <li>
+                    <div title="Спутниковые Данные" id="icSat" class="MenuButton"></div>
+                    <ul id="TabBorderSat" class ="BackgroundBorder">
+                        <li onclick="TWSelUnSel('twPSat', 'twSat')" style="cursor:pointer;"><div class="arr" id="twPSat"></div>Космические снимки</li>
+                            <div id="twSat" class="tree-view">
+                                <ul>
+                                    <li><input type="checkbox" name="visLayers" id="cbModis"/>TERRA/AQUA (MODIS)</li> 
+                                    <li><input type="checkbox" name="visLayers" id="cbMeteor1"/>Метеор-М №1 (КМСС)</li>
+                                    <li><input type="checkbox" name="visLayers" id="cbKanopus"/>Канопус-В (МСС)</li>
+                                    <li><input type="checkbox" name="visLayers" id="cbLandsat8"/>Landsat 8 (OLI)</li> 
+                                    <li><input type="checkbox" name="visLayers" id="cbResursp"/>Ресурс-П №1 (ШМСА)</li> 
+                                </ul>
+                            </div>
+                        <li><input type="checkbox" name="visLayers" id="cbFloodPolygons"/>Вектора разливов рек</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowMap"/>Карты снежного покрова</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowBorders"/>Граница снежного покрова</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbMTSAT"/>Облачность</li>
+                        <li><input type="checkbox" name="visLayers" id="cbAscat"/>Влажность почвы</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Гидрологическая информация с постов" id="icHyd" class="MenuButton"></div>
+                    <ul id="TabBorderHyd" class="BackgroundBorder">
+                        <li><input type="checkbox" name="visLayers" id="cbWaterLevel"/>Уровни воды</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbSnowDepth"/>Высота снега (КН-01)</li>
+                        <li><input type="checkbox" name="visLayers" id="cbSnowDepth24"/>Высота снега (КН-24)</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Метеорологическая информация с постов" id="icMet" class="MenuButton"></div>            
+                    <ul id="TabBorderMet" class="BackgroundBorder">
+                        <li><input type="checkbox" name="visLayers" id="cbMeteo"/>Температура, давление</li> 
+                        <li><input type="checkbox" name="visLayers" id="cbWindSpeed"/>Скорость ветра</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherEvent"/>Погодные явления</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherEventCol"/>Погодные явления цвет</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherTmpIso"/>Температура изолинии</li>
+                        <li><input type="checkbox" name="visLayers" id="cbWeatherPresIso"/>Давление изолинии</li>
+                    </ul>
+                </li>
+                <li>
+                    <div title="Прогнастические данные" id="icFor" class="MenuButton"></div>            
+                    <ul id="TabBorderFor" class="BackgroundBorder">                        
+                        <li onclick="TWSelUnSel('twPWRF', 'twWRF')" style="cursor:pointer;"><div class="arr" id="twPWRF"></div>Прогностические данные</li>
+                        <div id="twWRF" class="tree-view" style="position:relative;">
+                            <ul>
+                                <li><div id="hpselDiv"></div>
+                                    <input type="checkbox" name="visLayers" id="cbHGTIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbHGTField"/>Заливка
+                                </li>
+                                <li><div id="tmpselDiv"></div><!--Температура<br/>-->
+                                    <input type="checkbox" name="visLayers" id="cbTMPIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbTMPField"/>Заливка                                
+                                </li>
+                                <li><div id="rhselDiv"></div><!--Влажность<br/>-->
+                                    <input type="checkbox" name="visLayers" id="cbRHIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbRHField"/>Заливка
+                                </li>
+                                <!--<li>Давление (ур. моря)<br/>-->
+                                <li><table><tr><td style="width:95px;">Давление</td><td style="width:85px;">(ур. моря)</td></tr></table>
+                                    <input type="checkbox" name="visLayers" id="cbPRMSLIsoline"/>Изолинии
+                                    <input type="checkbox" name="visLayers" id="cbPRMSLField"/>Заливка
+                                </li>
+                                <!--<li><input type="checkbox" name="visLayers" id="cbGRIBWind"/>Скорость и направление ветра</li>-->
+                                <li><div id="windselDiv"></div>
+                                    <input type="checkbox" name="visLayers" id="cbGRIBWind"/>Перья
+                                    <input type="checkbox" name="visLayers" id="cbGRIBWindF"/>Скорость
+                                </li>
+                                <li><input type="checkbox" name="visLayers" id="cbTCDCField"/>Облачность</li>
+                                <li><input type="checkbox" name="visLayers" id="cbAPCPField"/>Осадки за 3 часа</li>
+                            </ul>
+                        </div>
+                        <li><input type="checkbox" name="visLayers" id="cbFloodPred"/>Расчет разливов по станциям</li>
+                        <li><div class="arr" id="twPZVM" onclick="TWSelUnSel('twPZVM', 'twZVM')"></div><input type="checkbox" name="visLayers" id="cbZeyaForecast"/>Зейское вдхр.</li>
+                        <div id="twZVM" class="tree-view">
+                            <ul>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaCOSMO"/>модель COSMO</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaNCEP"/>модель NCEP</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaUKMO"/>модель UKMO</li>
+                                <li><input type="radio" name="grzvdnh" id="cbZeyaJMA"/>модель JMA</li>
+                            </ul>
+                        </div>
+                        <li><input type="checkbox" name="visLayers" id="cbLevelForecast"/>Прогноз уровней воды</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div id="overviewMapWindow" class="moveable_omap BackgroundBorder mov" draggable="true">
+            <img src="images/i_overview.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
+            <div style="text-align:center; line-height:25px;"> Обзор карты </div>
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('overviewMapWindow');"/>            
+            <div id="overviewMapDiv" style="width:100%; height:90%;"></div>
+        </div>
+        
+        <div id="legendWindow" class="moveable BackgroundBorder mov">
+            <div draggable="true">
+                <img src="images/i_legend.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
+                Легенда карты
+                <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('legendWindow');"/>            
+            </div>
+            <div id="legendDiv" draggable="false" onSelectStart="return false"></div>
+        </div>
+
+        
+        <div id="predictWindow" style ="display:none;" class="moveable BackgroundBorder mov">
+            <div draggable="true">
+                <img src="images/i_legend.png" style="height:20px; width:20px; position:absolute; top:1px; left:30px;"/>
+               Станции для прогнозов
+                <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px;" onclick="ShowHideWindow('predictWindow');"/>            
+            </div>
+            
+            <input value="Прогноз" style="vertical-align:top; margin:10px 2px;" type="button"  id="PredictFloods" onclick="PredictLayerShow()" />
+            <input value="Выбрать" style="vertical-align:top;margin:10px 2px;" type="button"  id="PredictSetStations" onclick="PredictSetStations()" />
+
+            <input value="- ур" style="vertical-align:top;margin:10px 2px;" type="button" id="PredictMinus" onclick="PredictAddLevel2All(-10)" />
+            <input value="+ ур" style="vertical-align:top;margin:10px 2px;" type="button"  id="PredPlus" onclick="PredictAddLevel2All(10)" />
+            <div id="predictLoading" style="position:absolute;top:44%;left:38%"></div>
+            <div id="divPredictTable" style="width:97%; height:85%; overflow-y:auto; margin:0 auto"></div>
+        </div>
+
+        <div id="timeWindow" style="position:absolute;right:10px;bottom:10px;" onSelectStart="return false" >            
+            <!--<div style="position:absolute; top:0; left:0; width:612px; height:20px; z-index:100; cursor:pointer;" onMousedown="initializedragRB(event,'timeWindow')" onMouseup="stopdrag()"></div>-->
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px; z-index:46;" onclick="ShowHideWindow('timeWindow');"/>
+           
+        </div>
+
+        <div id="loginWindow" class="CommonBorder BackgroundBorder" style="position:absolute; left:70px; top:42px; height:80px; width:180px; padding:10px 3px 10px 3px; z-index:55;" >
+            <table>
+                <tr><td>Логин</td><td><input type="text" style="width:100%;" id="tlogin"></td></tr>
+                <tr><td>Пароль</td><td><input type="Password" style="width:100%;" id="tpass"></td></tr>
+                <tr><td colspan="2"><input id="inputOutput" type="button" style="width:100%;" value="Войти" onclick="GetToken()" /></td></tr>
+            </table>
+        </div>
+
+        <div id="AboutImage" class="CommonBorder BackgroundBorder">
+            <img id="Img1" src="images/about.png" style="height:200px; width:500px; margin-left:10px; margin-bottom:-6px; cursor:pointer;"/>
+            <div class="progress-bar silver glow">
+                <span id="progBar" style="width: 0%"></span>
+            </div>
+            <a href="http://www.dvrcpod.ru/" title="ДЦ ФГБУ &quot;НИЦ &quot;Планета&quot;" target="_blank" style="position:absolute; margin:220px; margin-top:-40px; z-index:60;">www.dvrcpod.ru</a>
+            <a href="http://khabmeteo.ru/" title="ФГБУ &quot;Дальневосточное УГМС&quot;" target="_blank" style="position:absolute; margin:225px; margin-top:-150px; z-index:60; ">www.khabmeteo.ru</a>
+        </div>
+
+        <div id="InfoWindow" class="CommonBorder BackgroundBorder">            
+            <img src="images/dismiss.png" style="height:20px; width:20px; position:absolute; top:2px; right:5px; z-index:46;" onclick="ShowHideWindow('InfoWindow');"/>
+        </div>
+        <div id="InfoTriangle" class="triangleRight"></div>
+        <div id="loadingImg" style="position:absolute; left:50%; margin-left:-50px; top:100px; z-index:150;"><img src="images/loadingImage.gif"/></div>
+
+        <!-- Маска, которая затемняет весь экран и окно с ошибкой -->
+        <div id="mask"  ></div>
+        <div id="dialog" class="window BackgroundBorder CommonBorder" style="text-align:center;vertical-align: middle;font-size:15px;border:2px solid red;">   </div>
+
+      <script>
+
+          var dragSrcEl = null;
+
+          function drag_start(event) {
+              var style = window.getComputedStyle(event.target, null);
+              event.dataTransfer.setData("Text", (parseInt(event.currentTarget.offsetLeft, 10) - event.clientX) + ',' + (parseInt(event.currentTarget.offsetTop, 10) - event.clientY));
+              dragSrcEl = this;
+          }
+          function drag_over(event) {
+              event.dataTransfer.dropEffect = 'move';
+              event.preventDefault();
+              return false;
+          }
+          function drop(event) {
+              var offset = event.dataTransfer.getData("Text").split(',');
+//              var dm = document.getElementById('legendWindow');
+              dragSrcEl.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
+              dragSrcEl.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
+              event.preventDefault();
+              return false;
+          }
+          var elems = document.querySelectorAll('.mov');
+          [].forEach.call(elems, function (elem) {
+              elem.addEventListener('dragstart', drag_start, false);
+          });
+          document.body.addEventListener('dragover', drag_over, false);
+          document.body.addEventListener('drop', drop, false);
+      </script>
+
+  </body>
+
+</html>
