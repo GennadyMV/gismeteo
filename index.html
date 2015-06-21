@@ -58,8 +58,7 @@
     <h1>ГИС "МЕТЕО ДВ"</h1>
     <p>Добро пожаловать на геоинформационный портал Дальневосточного региона РФ.<br>Портал предназначен для представления гидрометеорологической, гелиофизической и спутниковой информации по территории Дальнего Востока.</p>
     
-          <a href="gis.html" class="smoothScroll btn btn-lg">Смотреть геоинформационный портал МЕТЕО-ДВ</a> <br>
-          <a href="http://hydro.meteoinfo.ru/amur" class="smoothScroll btn btn-lg">Смотреть гидрологический портал Гидрометцентра "Амур"</a> 
+          <a href="gis.html" class="smoothScroll btn btn-lg">Смотреть геоинформационный портал МЕТЕО-ДВ</a> 
           
         
   </header>
@@ -211,6 +210,7 @@
             <figure> <img class="img-responsive" src="assets/img/portfolio/folio04.jpg" alt="">
               <figcaption>
                 <h5>Прогностическая продукция</h5>
+                figcaption>
               </figcaption>
               <!-- /figcaption --> 
             </figure>
@@ -221,6 +221,25 @@
 
       </div>
 
+
+
+        <!-- PORTFOLIO IMAGE 2 -->
+        <div class="col-md-3  ">
+          <h5>Геофизическая продукция</h5>
+          <div class="grid mask">
+            <figure> <img class="img-responsive" src="assets/img/portfolio/folio05.gif" alt="">
+              <figcaption>
+                <!--<h5>Геофизическая продукция</h5>-->
+                <a data-toggle="modal" href="#modal-geospace" class="btn btn-default">Смотреть геофизическую продукцию</a> </
+              </figcaption>
+              <!-- /figcaption --> 
+            </figure>
+            <!-- /figure --> 
+          </div>
+          <!-- /grid-mask --> 
+        </div>
+
+      </div>
 
       <div class="row">  
         
@@ -244,6 +263,78 @@
   </div>
 </div>
 <!-- /container --> 
+
+<!-- Modal Product -->
+
+<div class="modal fade bs-example-modal-lg" id="modal-geospace" tabindex="-1" role="dialog" aria-labelledby="modal-label-geospace" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Геофизическая продукция ФГБУ "Дальневосточное УГМС"</h4>
+              </div>
+              <div class="modal-body">
+                <p><img class="img-responsive" src="assets/img/portfolio/folio01-preview.jpg" alt=""></p>
+                <p>
+                  <h3>
+                    Месячный прогноз ионосферной магнитной возмущенности
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="300" src="http://meteo-dv.ru/mediana/Products/ShowForecastMonthIonosphera" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+                 <h3>
+                    Пятидневный прогноз медианы
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="300" src="http://meteo-dv.ru/mediana/Products/ShowForecastDaysFives" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+
+                 <h3>
+                    Обзор гелеогеофизической обстановки, прогноз на 1-3 суток
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="400" src="http://meteo-dv.ru/mediana/Products/ShowReviewGeoenv" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+
+                 <h3>
+                    Месячный обзор гелеогеофизической обстановки
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="400" src="http://meteo-dv.ru/mediana/Products/ShowReviewGeoenvMonth" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+
+
+                 <h3>
+                    Сводная таблица по разделам: солнце, магнитное поле Земли, ионосфера
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="200" src="http://meteo-dv.ru/mediana/Products/ShowTableSun" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+
+
+                 <h3>
+                    Таблица нарушения радиосвязи
+                  </h3>
+                  <iframe frameborder=0 width="100%" height="200" src="http://meteo-dv.ru/mediana/Products/ShowDisturbanceRadio" seamless scrolling="auto" align="left">
+                    Ваш браузер не поддерживает плавающие фреймы!
+                 </iframe>
+
+                </p>
+              <!--  <p><b><a href="#">Visit Site</a></b></p> -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              </div>
+            </div>
+            <!-- /.modal-content --> 
+          </div>
+          <!-- /.modal-dialog --> 
+        </div>
+        <!-- /.modal --> 
+
+
+<!-- End Modal Product -->
+
 
 
 
