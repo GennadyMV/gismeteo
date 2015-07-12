@@ -302,13 +302,14 @@
                 gp.getResultData(jobInfo.jobId, "result",
                     function (gpLayer) {
                         var obj = gpLayer.value.split(/[:{}\[\],]/);
-                        var objTMP = [], objDTP = [], objP = [], obj2 = undefined;
+                        var objTMP = [], objDTP = [], objP = [], objW = [], obj2 = undefined;
                         var minT = -30, maxT = 30, minP = 900, maxP = 1100;
                         var k = -1;
                         for (var i = 0; i < obj.length; i++) {
                             if (obj[i].indexOf("DTP") > -1) { obj2 = objDTP; k = -1; }
                             if (obj[i].indexOf("TMP") > -1) { obj2 = objTMP; k = -1; }
                             if (obj[i].indexOf("PRMSL") > -1) { obj2 = objP; k = -1; }
+                            if (obj[i].indexOf("WIND") > -1) { obj2 = objW; k = -1; }
 
                             if (obj[i].indexOf("minT") > -1) { minT = parseFloat(obj[i + 1]); }
                             if (obj[i].indexOf("maxT") > -1) { maxT = parseFloat(obj[i + 1]); }
@@ -322,6 +323,7 @@
                                 obj2[k].push(tms);
                             }
                             if (obj[i].indexOf("Value") > -1) { obj2[k].push(parseFloat(obj[i + 1])); }
+                            //if (obj[i].indexOf("Value2") > -1) { obj2[k].push(parseFloat(obj[i + 1])); }
                         }
 
                         for (var j = 0; j < objTMP.length; j++) {
@@ -944,7 +946,7 @@
             var Graph = new dcrscplaneta.clsGraph({ width: 480, height: 100, lheight: 30, xs: this.xTimes[0], xe: this.xTimes[this.xTimes.length - 1]});
             Graph.PrepareGraph();
             this.Graphs.push(Graph);
-            Graph.createMeteoGraphFromUrl(event.mapPoint, ip_serv + "arcgis/rest/services/geoproc/getmeteoground/GPServer/getmeteoground");
+            Graph.createMeteoGraphFromUrl(event.mapPoint, ip_serv + "arcgis/rest/services/geoproc/getmeteoground_n/GPServer/getmeteoground");
             this.dGraphs.appendChild(Graph.domNode);
 
             var GraphM = new dcrscplaneta.clsGraph({ width: 480, height: 100, lheight: 30, xs: this.xTimes[0], xe: this.xTimes[this.xTimes.length - 1] });

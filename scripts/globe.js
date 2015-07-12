@@ -55,9 +55,9 @@ var basemapGallery;
 
 var lDConfig = {
     'layer0'            : { visName: "", chBoxes: [], dField: "", fLegend: "" },
-    'MODIS_Raster'      : { visName: "TERRA/AQUA (MODIS)", chBoxes: ['cbModis'], dField: 'DataDateTime', dbname : 'AMD_master_raster_cat', fLegend: "R(0.776-0.841 мкм)<br>G(0.776-0.841 мкм)<br> B(0.620-0.670 мкм))"},
+    'MODIS_Raster'      : { visName: "TERRA/AQUA (MODIS)", chBoxes: ['cbModis'], dField: 'datadatetime', dbname : 'amd_image_modis_cat', fLegend: "R(0.776-0.841 мкм)<br>G(0.776-0.841 мкм)<br> B(0.620-0.670 мкм))"},
     'METEOR1_Raster': { visName: "Метеор-М №1 (КМСС)", chBoxes: ['cbMeteor1'], dField: 'DataDateTime', dbname: 'AMD_master_raster_cat', fLegend: "R(0.760-0.900 мкм)<br>G(0.580-0.690 мкм)<br>B(0.450-0.510 мкм))" },
-    'LANDSAT8_Raster': { visName: "Landsat 8 (OLI)", chBoxes: ['cbLandsat8'], dField: 'DataDateTime', dbname: 'AMD_master_raster_cat', fLegend: "R(2.100-2.300 мкм)<br>G(0.850-0.890 мкм)<br>B(0.530-0.600 мкм))" },
+       'LANDSAT8_Raster': { visName: "Landsat 8 (OLI)", chBoxes: ['cbLandsat8'], dField: 'DataDateTime', dbname: 'AMD_master_raster_cat', fLegend: "R(2.100-2.300 мкм)<br>G(0.850-0.890 мкм)<br>B(0.530-0.600 мкм))" },
     'RESURSP_Raster': { visName: "Ресурс-П №1 (ШМСА)", chBoxes: ['cbResursp'], dField: 'DataDateTime', dbname: 'AMD_master_raster_cat', fLegend: "R(? мкм)<br>G(? мкм)<br>B(? мкм))" },
     'KANOPUS_Raster': { visName: "Канопус-В (МСС)", chBoxes: ['cbKanopus'], dField: 'DataDateTime', dbname: 'AMD_master_raster_cat', fLegend: "R(? мкм)<br>G(? мкм)<br>B(? мкм))" },
     'Flood': { visName: "Разливы", chBoxes: ['cbFloodPolygons'], dField: 'datadatetime', dbname: 'db_gp_planeta.public.view_floods_moscow', fLegend: "", datefromlayer: "0" },

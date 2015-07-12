@@ -62,13 +62,14 @@ function initDatesSelector() {
                                 var pS = new Date(compDate.getTime() + 1000);
                                 var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
                                 //inSelect += " OR datadatetime between date'" + tmS + "' and date'" + tpS +"'";
-                                inSelect += " OR ((datadatetime > date '" + tmS + "') and datadatetime < (date '" + tpS + "'))"
+                                //    inSelect += " OR ((datadatetime >  '" + tmS + "') and datadatetime < ( '" + tpS + "'))"
+                                inSelect += " OR ((datadatetime >  '" + tmS + "') and datadatetime < ( '" + tpS + "'))"
                             }
                         }
                     }
                     inSelect = inSelect.substring(4);
                     if (inSelect == "") {
-                        inSelect = "datadatetime < date '0001-01-01'";
+                        inSelect = "datadatetime <  '0001-01-01'";
                         //disable checkbox
                         for (var j = 0; j < lDConfig[id].chBoxes.length; j++) { dojo.byId(lDConfig[id].chBoxes[j]).checked = false; }
                         map.getLayer(id).hide();
@@ -99,7 +100,7 @@ function initDatesSelector() {
                                 var tmS = mS.getUTCFullYear() + "-" + ("0" + (mS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + mS.getUTCDate()).slice(-2) + " " + ("0" + mS.getUTCHours()).slice(-2) + ":" + ("0" + mS.getUTCMinutes()).slice(-2) + ":" + ("0" + mS.getUTCSeconds()).slice(-2);
                                 var pS = new Date(compDate.getTime() + 1000);
                                 var tpS = pS.getUTCFullYear() + "-" + ("0" + (pS.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + pS.getUTCDate()).slice(-2) + " " + ("0" + pS.getUTCHours()).slice(-2) + ":" + ("0" + pS.getUTCMinutes()).slice(-2) + ":" + ("0" + pS.getUTCSeconds()).slice(-2);
-                                //inSelect += " OR datadatetime between date'" + tmS + "' and date'" + tpS +"'";
+                                //inSelect += " OR datadatetime between '" + tmS + "' and '" + tpS +"'";
                                 inSelect += " OR ((datadatetime > '" + tmS + "') and (datadatetime < '" + tpS + "'))"
                             }
                         }
@@ -144,7 +145,7 @@ function initDatesSelector() {
                     }
                     inSelect = inSelect.substring(4);
                     if (inSelect == "") {
-                        //inSelect = "datadatetime < date'0001-01-01'";
+                        //inSelect = "datadatetime < '0001-01-01'";
                         //disable checkbox
                         for (var j = 0; j < lDConfig[id].chBoxes.length; j++) {
                             dojo.byId(lDConfig[id].chBoxes[j]).checked = false;
@@ -291,7 +292,7 @@ function initDatesSelector() {
                 var a = map.getLayer(this.id).__proto__.declaredClass;
                 //var Image = ['MODIS_Raster', 'METEOR1_Raster', 'LANDSAT8_Raster', 'RESURSP_Raster', 'KANOPUS_Raster'];
                 if ( map.getLayer(this.id).__proto__.declaredClass === "esri.layers.ArcGISImageServiceLayer") {//Image.indexOf(this.id) > -1) {
-                    map.getLayer(this.id).setDefinitionExpression("DataDateTime between date '" + ds + "' and date '" + de + "'");
+                    map.getLayer(this.id).setDefinitionExpression("DataDateTime between '" + ds + "' and '" + de + "'");
                     return;
                 }
                 if (map.getLayer(this.id).__proto__.declaredClass === "dcrscplaneta.clsChangeItemDMSLField") {//Image.indexOf(this.id) > -1) {

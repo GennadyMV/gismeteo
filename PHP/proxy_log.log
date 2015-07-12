@@ -97,3 +97,35 @@
 04-24-15 00:21:34 | could not find driver
 04-24-15 00:21:38 | Ok to proxy
 04-24-15 00:21:38 | Proxy complete
+ 
+06-21-15 23:49:08 | GET detected
+06-21-15 23:49:08 | Proxy could not resolve requested url - http://10.0.0.31:6080/arcgis/rest/services/cosmic/sea_wind/ImageServer/exportImage.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:23:25 | GET detected
+07-02-15 22:23:25 | This proxy does not support empty parameters.
+ 
+07-02-15 22:24:30 | GET detected
+07-02-15 22:24:30 | Proxy could not resolve requested url - http://planet.rssi.ru/arcgis_n/rest/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:25:30 | GET detected
+07-02-15 22:25:30 | Proxy could not resolve requested url - http://planet.rssi.ru/arcgis_n/rest/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:25:33 | GET detected
+07-02-15 22:25:33 | Proxy could not resolve requested url - http://planet.rssi.ru/arcgis_n/rest/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:25:34 | GET detected
+07-02-15 22:25:34 | Proxy could not resolve requested url - http://planet.rssi.ru/arcgis_n/rest/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:25:35 | GET detected
+07-02-15 22:25:35 | Proxy could not resolve requested url - http://planet.rssi.ru/arcgis_n/rest/.  Possible solution would be to update 'mustMatch', 'matchAll' or 'url' property in the configuration file.
+ 
+07-02-15 22:26:08 | GET detected
+07-02-15 22:26:08 | could not find driver
+07-02-15 22:26:08 | Ok to proxy
+07-02-15 22:26:08 | Proxy complete
+ 
+07-03-15 06:04:34 | GET detected
+07-03-15 06:04:34 | could not find driver
+07-03-15 06:07:43 | Curl error or no response: couldn't connect to host
+07-03-15 06:07:43 | Ok to proxy
+07-03-15 06:07:43 | Proxy complete

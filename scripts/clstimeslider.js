@@ -13,6 +13,10 @@ dojo.require("dojo.parser");
 dojo.require("dijit.form.DateTextBox");
 dojo.require("esri.TimeExtent");
 
+function getStyle(elem) {
+    return window.getComputedStyle ? getComputedStyle(elem, "") : elem.currentStyle;
+}
+
 
 function initTimeSlider(objSet) {
     function getChar(event) {
@@ -470,8 +474,15 @@ function initTimeSlider(objSet) {
             this.dCalendar.style.display = 'block';
         },
         hideCalendarI: function (evt) {
-            function isHover(e) { return (e.parentElement.querySelector(':hover') === e); }            
-            if (!isHover(this.domNode)) { this.dCalendar.style.display = 'none'; }
+            papa = {value: this};
+            setTimeout(function () {
+                //oop.cng()
+                if (parseInt(getStyle(papa.value.dSettings).top) > -35) {
+                    papa.value.dCalendar.style.display = 'none';
+                }
+            }, 100);
+            //function isHover(e) { return (e.parentElement.querySelector(':hover') === e); }            
+            //if (!isHover(this.domNode)) { this.dCalendar.style.display = 'none'; }
         },
         minusMonth: function (evt) {            
             var mdk = new Date(this.inpval.substr(0, 4), this.inpval.substr(4, 2) -1, 5);

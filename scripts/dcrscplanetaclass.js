@@ -231,118 +231,118 @@ function initAddClasses() {
             this._updateGraphs();
         },
         _updateGraphs: function () {
-			if (this.visible) {
-				this.clear();
-				var papa = { value: this, width: parseInt(this.mMap.width / 40), bwidth: this.mMap.width, height: parseInt(this.mMap.height / 40), bheight: this.mMap.height, speed1: undefined, dir1: undefined, speed2: undefined, dir2: undefined }
-				//Calc Extent
-				var meters360 = 40075016.6855784861531768177614;
-				//  var meters180 = 20037508.3427892430765884088807;
-				var diff = this.mMap.extent.xmax - this.mMap.extent.xmin;
-				var nxmax = this.mMap.extent.xmax % meters360;
-				var nxmin = nxmax - diff;
-				var nxmax180 = 0;
-				var nxmin180 = 0;
-	
-				if (nxmin >= 0) {                
-					nxmax180 = nxmax - meters360;
-					nxmin180 = nxmin - meters360;                
-				}
-				else {
-					nxmax180 = nxmax;
-					nxmin180 = nxmin;
-					nxmin = meters360 + nxmin;
-					nxmax = meters360 + nxmax;                
-				}
-				//Extract speed
-				var params = {
-					bbox: nxmin + "," + this.mMap.extent.ymin + "," + nxmax + "," + this.mMap.extent.ymax,
-					bboxSR: this.mMap.extent.spatialReference.wkid,
-					size: papa.width + "," + papa.height,
-					imageSR: this.mMap.extent.spatialReference.wkid,
-					mosaicRule: (this.nTime === "") ? "":'{"where":"' +this.nTime + '"}',
-					renderingRule: '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][0] + '], "Raster" : "$$" }  }',
-					interpolation: "RSP_NearestNeighbor",
-					format: "bip",
-					pixelType: "F32",
-					f: "image"
-				};
-				var xhr = new XMLHttpRequest();
-	
-				xhr.open('GET', this.nUrl + dojo.objectToQuery(params));
-				xhr.responseType = "arraybuffer";
-				xhr.onload = function (e) { papa.speed1 = new DataView(xhr.response); combiner(); };
-				xhr.send();
-				//Extract dir
-				params.bbox = nxmin + "," + this.mMap.extent.ymin + "," + nxmax + "," + this.mMap.extent.ymax;
-				params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][1] + '], "Raster" : "$$" }  }';
-				var xhr2 = new XMLHttpRequest();
-				xhr2.open('GET', this.nUrl +  dojo.objectToQuery(params));
-				xhr2.responseType = "arraybuffer";
-				xhr2.onload = function (e) { papa.dir1 = new DataView(xhr2.response); combiner(); };
-				xhr2.send();
-				//Extract speed180
-				params.bbox = nxmin180 + "," + this.mMap.extent.ymin + "," + nxmax180 + "," + this.mMap.extent.ymax;
-				params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][0] + '], "Raster" : "$$" }  }';
-				var xhr3 = new XMLHttpRequest();
-				xhr3.open('GET', this.nUrl + dojo.objectToQuery(params));
-				xhr3.responseType = "arraybuffer";
-				xhr3.onload = function (e) { papa.speed2 = new DataView(xhr3.response); combiner(); };
-				xhr3.send();
-				//Extract dir180
-				params.bbox = nxmin180 + "," + this.mMap.extent.ymin + "," + nxmax180 + "," + this.mMap.extent.ymax;
-				params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][1] + '], "Raster" : "$$" }  }';
-				var xhr4 = new XMLHttpRequest();
-				xhr4.open('GET', this.nUrl + dojo.objectToQuery(params));
-				xhr4.responseType = "arraybuffer";
-				xhr4.onload = function (e) { papa.dir2 = new DataView(xhr4.response); combiner(); };
-				xhr4.send();
-	
-				function combiner() {
-					if ((papa.speed1 != undefined) && (papa.dir1 != undefined) && (papa.speed2 != undefined) && (papa.dir2 != undefined)) {
-						var hrindex = ["0", "13", "46", "78", "911", "1213", "1416", "1718", "1921", "2223", "2426", "2728", "2931", "3233", "3436", "3738", "3941", "4243", "4446", "4748", "4951", "5253", "5456", "5758", "5961", "6263", "6466", "6768", "6971"];
-						var mask_offset = papa.height * papa.width * 4;
-						for (var j = 0; j < papa.height ; j += 2) {
-							for (var i = 0; i < papa.width ; i += 2) {
-								var krex = (j * papa.width + i);
-								var koko = papa.speed1.getInt8(mask_offset + parseInt(krex / 8), true);
-								if (((koko >>> (7 - krex % 8)) & 1) == 1) {
-									var led = (j * papa.width + i) * 4;
-									//var point = new esri.geometry.ScreenPoint(20 + i * 40, 20 + j * 40);
-									var point = new esri.geometry.ScreenPoint((i * papa.bwidth) / (papa.width - 1), 20 + j * (papa.bheight - 40) / (papa.height - 1));
-									var geomPoint = esri.geometry.toMapGeometry(papa.value.mMap.extent, papa.value.mMap.width, papa.value.mMap.height, point);
-									var speed = papa.speed1.getFloat32(led, true);
-									var dir = papa.dir1.getFloat32(led, true);
-									var indrex = parseInt(speed / 2.5);
-									var symbol = new esri.symbols.PictureMarkerSymbol("images/wind/" + hrindex[indrex] + ".png", 40, 40);
-									symbol.setAngle(dir + 90);
-									var graphic = new esri.graphic(geomPoint, symbol);
-									papa.value.add(graphic);
-								}
-							}
-						}
-						for (var j = 0; j < papa.height ; j += 2) {
-							for (var i = 0; i < papa.width ; i += 2) {
-								var krex = (j * papa.width + i);
-								var koko = papa.speed2.getInt8(mask_offset + parseInt(krex / 8), true);
-								if (((koko >>> (7 - krex % 8)) & 1) == 1) {
-									var led = (j * papa.width + i) * 4;
-									//var point = new esri.geometry.ScreenPoint(20 + i * 40, 20 + j * 40);
-									var point = new esri.geometry.ScreenPoint((i * papa.bwidth) / (papa.width - 1), 20 + j * (papa.bheight - 40) / (papa.height - 1));
-									var geomPoint = esri.geometry.toMapGeometry(papa.value.mMap.extent, papa.value.mMap.width, papa.value.mMap.height, point);
-									var speed = papa.speed2.getFloat32(led, true);
-									var dir = papa.dir2.getFloat32(led, true);
-									var indrex = parseInt(speed / 2.5);
-									var symbol = new esri.symbols.PictureMarkerSymbol("images/wind/" + hrindex[indrex] + ".png", 40, 40);
-									symbol.setAngle(dir + 90);
-									var graphic = new esri.graphic(geomPoint, symbol);
-									papa.value.add(graphic);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+            if (this.visible) {
+                this.clear();
+                var papa = { value: this, width: parseInt(this.mMap.width / 40), bwidth: this.mMap.width, height: parseInt(this.mMap.height / 40), bheight: this.mMap.height, speed1: undefined, dir1: undefined, speed2: undefined, dir2: undefined }
+                //Calc Extent
+                var meters360 = 40075016.6855784861531768177614;
+                //  var meters180 = 20037508.3427892430765884088807;
+                var diff = this.mMap.extent.xmax - this.mMap.extent.xmin;
+                var nxmax = this.mMap.extent.xmax % meters360;
+                var nxmin = nxmax - diff;
+                var nxmax180 = 0;
+                var nxmin180 = 0;
+
+                if (nxmin >= 0) {
+                    nxmax180 = nxmax - meters360;
+                    nxmin180 = nxmin - meters360;
+                }
+                else {
+                    nxmax180 = nxmax;
+                    nxmin180 = nxmin;
+                    nxmin = meters360 + nxmin;
+                    nxmax = meters360 + nxmax;
+                }
+                //Extract speed
+                var params = {
+                    bbox: nxmin + "," + this.mMap.extent.ymin + "," + nxmax + "," + this.mMap.extent.ymax,
+                    bboxSR: this.mMap.extent.spatialReference.wkid,
+                    size: papa.width + "," + papa.height,
+                    imageSR: this.mMap.extent.spatialReference.wkid,
+                    mosaicRule: (this.nTime === "") ? "" : '{"where":"' + this.nTime + '"}',
+                    renderingRule: '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][0] + '], "Raster" : "$$" }  }',
+                    interpolation: "RSP_NearestNeighbor",
+                    format: "bip",
+                    pixelType: "F32",
+                    f: "image"
+                };
+                var xhr = new XMLHttpRequest();
+
+                xhr.open('GET', this.nUrl + dojo.objectToQuery(params));
+                xhr.responseType = "arraybuffer";
+                xhr.onload = function (e) { papa.speed1 = new DataView(xhr.response); combiner(); };
+                xhr.send();
+                //Extract dir
+                params.bbox = nxmin + "," + this.mMap.extent.ymin + "," + nxmax + "," + this.mMap.extent.ymax;
+                params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][1] + '], "Raster" : "$$" }  }';
+                var xhr2 = new XMLHttpRequest();
+                xhr2.open('GET', this.nUrl + dojo.objectToQuery(params));
+                xhr2.responseType = "arraybuffer";
+                xhr2.onload = function (e) { papa.dir1 = new DataView(xhr2.response); combiner(); };
+                xhr2.send();
+                //Extract speed180
+                params.bbox = nxmin180 + "," + this.mMap.extent.ymin + "," + nxmax180 + "," + this.mMap.extent.ymax;
+                params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][0] + '], "Raster" : "$$" }  }';
+                var xhr3 = new XMLHttpRequest();
+                xhr3.open('GET', this.nUrl + dojo.objectToQuery(params));
+                xhr3.responseType = "arraybuffer";
+                xhr3.onload = function (e) { papa.speed2 = new DataView(xhr3.response); combiner(); };
+                xhr3.send();
+                //Extract dir180
+                params.bbox = nxmin180 + "," + this.mMap.extent.ymin + "," + nxmax180 + "," + this.mMap.extent.ymax;
+                params.renderingRule = '{ "rasterFunction" : "ExtractBand", "rasterFunctionArguments" : { "BandIDs" : [' + this.reISB[this.nLevel][1] + '], "Raster" : "$$" }  }';
+                var xhr4 = new XMLHttpRequest();
+                xhr4.open('GET', this.nUrl + dojo.objectToQuery(params));
+                xhr4.responseType = "arraybuffer";
+                xhr4.onload = function (e) { papa.dir2 = new DataView(xhr4.response); combiner(); };
+                xhr4.send();
+
+                function combiner() {
+                    if ((papa.speed1 != undefined) && (papa.dir1 != undefined) && (papa.speed2 != undefined) && (papa.dir2 != undefined)) {
+                        var hrindex = ["0", "13", "46", "78", "911", "1213", "1416", "1718", "1921", "2223", "2426", "2728", "2931", "3233", "3436", "3738", "3941", "4243", "4446", "4748", "4951", "5253", "5456", "5758", "5961", "6263", "6466", "6768", "6971"];
+                        var mask_offset = papa.height * papa.width * 4;
+                        for (var j = 0; j < papa.height ; j += 2) {
+                            for (var i = 0; i < papa.width ; i += 2) {
+                                var krex = (j * papa.width + i);
+                                var koko = papa.speed1.getInt8(mask_offset + parseInt(krex / 8), true);
+                                if (((koko >>> (7 - krex % 8)) & 1) == 1) {
+                                    var led = (j * papa.width + i) * 4;
+                                    //var point = new esri.geometry.ScreenPoint(20 + i * 40, 20 + j * 40);
+                                    var point = new esri.geometry.ScreenPoint((i * papa.bwidth) / (papa.width - 1), 20 + j * (papa.bheight - 40) / (papa.height - 1));
+                                    var geomPoint = esri.geometry.toMapGeometry(papa.value.mMap.extent, papa.value.mMap.width, papa.value.mMap.height, point);
+                                    var speed = papa.speed1.getFloat32(led, true);
+                                    var dir = papa.dir1.getFloat32(led, true);
+                                    var indrex = parseInt(speed / 2.5);
+                                    var symbol = new esri.symbols.PictureMarkerSymbol("images/wind/" + hrindex[indrex] + ".png", 40, 40);
+                                    symbol.setAngle(dir + 90);
+                                    var graphic = new esri.graphic(geomPoint, symbol);
+                                    papa.value.add(graphic);
+                                }
+                            }
+                        }
+                        for (var j = 0; j < papa.height ; j += 2) {
+                            for (var i = 0; i < papa.width ; i += 2) {
+                                var krex = (j * papa.width + i);
+                                var koko = papa.speed2.getInt8(mask_offset + parseInt(krex / 8), true);
+                                if (((koko >>> (7 - krex % 8)) & 1) == 1) {
+                                    var led = (j * papa.width + i) * 4;
+                                    //var point = new esri.geometry.ScreenPoint(20 + i * 40, 20 + j * 40);
+                                    var point = new esri.geometry.ScreenPoint((i * papa.bwidth) / (papa.width - 1), 20 + j * (papa.bheight - 40) / (papa.height - 1));
+                                    var geomPoint = esri.geometry.toMapGeometry(papa.value.mMap.extent, papa.value.mMap.width, papa.value.mMap.height, point);
+                                    var speed = papa.speed2.getFloat32(led, true);
+                                    var dir = papa.dir2.getFloat32(led, true);
+                                    var indrex = parseInt(speed / 2.5);
+                                    var symbol = new esri.symbols.PictureMarkerSymbol("images/wind/" + hrindex[indrex] + ".png", 40, 40);
+                                    symbol.setAngle(dir + 90);
+                                    var graphic = new esri.graphic(geomPoint, symbol);
+                                    papa.value.add(graphic);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     });
 
     dojo.declare("dcrscplaneta.clsChangeItemDMSL", esri.layers.ArcGISDynamicMapServiceLayer, {

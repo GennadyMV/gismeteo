@@ -125,9 +125,11 @@ function SetLayers() {
     var lShoreline = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/attrib/shoreline/MapServer", { id: "Shoreline", visible: false }); cntLayers++;
     //Add Sat Data
     //Растры
-    var modis = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_modis/ImageServer", { id: "MODIS_Raster", visible: false }); cntLayers++;
+       var modis = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_modis/ImageServer", { id: "MODIS_Raster", visible: false }); cntLayers++;
+   // var modis = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/rasters/modis_mosaic/MapServer", { id: "MODIS_Raster", visible: false }); cntLayers++;
     var meteor = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_meteor1/ImageServer", { id: "METEOR1_Raster", visible: false }); cntLayers++;
     var landsat = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_landsat8/ImageServer", { id: "LANDSAT8_Raster", visible: false }); cntLayers++;
+  //  var landsat = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/rasters/landsat_mosaic/MapServer", { id: "LANDSAT8_Raster", visible: false }); cntLayers++;
     var resurs = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_resursp/ImageServer", { id: "RESURSP_Raster", visible: false }); cntLayers++;
     var kanopus = new esri.layers.ArcGISImageServiceLayer(ip_serv + "arcgis/rest/services/rasters/image_kanopus/ImageServer", { id: "KANOPUS_Raster", visible: false }); cntLayers++;
     var floods = new esri.layers.ArcGISDynamicMapServiceLayer(ip_serv + "arcgis/rest/services/floods_clouds/floods_clouds/MapServer", { id: "Flood", visible: false }); cntLayers++;
