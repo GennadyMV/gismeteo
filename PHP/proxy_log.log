@@ -129,3 +129,9 @@
 07-03-15 06:07:43 | Curl error or no response: couldn't connect to host
 07-03-15 06:07:43 | Ok to proxy
 07-03-15 06:07:43 | Proxy complete
+ 
+07-14-15 21:44:49 | GET detected
+07-14-15 21:44:49 | could not find driver
+07-14-15 21:44:49 | Curl error or no response: couldn't connect to host
+07-14-15 21:44:49 | Ok to proxy
+07-14-15 21:44:49 | Proxy complete
